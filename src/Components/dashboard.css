@@ -1,0 +1,15 @@
+
+body {
+    background-image: url('C:\\Users\\surya.mopidevi\\Desktop\AustraliaVehicapricesFE\\Australiavehicals\\src\\Aus.jpg'); 
+    background-size: cover; 
+    background-repeat: no-repeat; 
+    background-position: center center; 
+    height: 100vh; 
+    margin: 0; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  
+  
