@@ -30,6 +30,7 @@ import Schedule from './Components/Scheduling/viewschedules';
 import UpdateSchedule from './Components/Scheduling/editschedule';
 import BookingDetails from './Components/Booking/bookingdetails';
 import SeatSelection from './Components/Booking/seatbooking';
+import ConfirmBooking from './Components/Booking/confirmbooking';
 ///
 
 
@@ -76,6 +77,7 @@ function App() {
         <Route path='/admin/Scheduling/editschedule/:id' element={<UpdateSchedule />} />
         <Route path='/Booking/bookingdetails/:id' element={<BookingDetails/>} />
         <Route path='/Booking/seatbooking/:id' element={<SeatSelection/>} />
+        <Route path='/Booking/Confirmbooking/:id' element={<ConfirmBooking/>} />
 
         ---
     

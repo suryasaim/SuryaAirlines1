@@ -6,10 +6,10 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function AdminNavBar() {
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <nav className="navbar navbar-expand-lg navbar-light fixed-top"style={{ backgroundColor: '#87CEEB' }}>
       <div className="container">
         <Link to="/admindashboard" className="navbar-brand">
-          Admin Dashboard
+          SURYA AIRLINES Admin Dashboard
         </Link>
         <button
           className="navbar-toggler"

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate, useParams } from 'react-router-dom';
+import Layout from '../layout';
 
 const BookingDetails = () => {
   const [users, setUsers] = useState([{ name: '', age: '', gender: '' }]);
@@ -54,12 +55,26 @@ const BookingDetails = () => {
       return;
     }
   
+    // Extract user details
+    const userDetails = users.map((user) => ({
+      name: user.name,
+      age: user.age,
+      gender: user.gender,
+    }));
+  
     // Store the data in sessionStorage
     const bookingData = {
-      users,
+      users: userDetails,
       bookingType,
+      // Add other details as needed
+      // scheduleIdFromSessionStorage: scheduleIdFromSessionStorage, // Remove this line
     };
+  
+    // Store the number of passengers separately
+    const numberOfPassengers = users.length;
+  
     sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
+    sessionStorage.setItem('numberOfPassengers', numberOfPassengers);
   
     try {
       // Parse the bookingInfo JSON string
@@ -85,8 +100,11 @@ const BookingDetails = () => {
     }
   };
   
+  
+  
 
   return (
+    <Layout>
     <div className="container mt-4">
       <h1>Booking Details</h1>
       <form>
@@ -171,6 +189,7 @@ const BookingDetails = () => {
         </div>
       </form>
     </div>
+    </Layout>
   );
 };
 

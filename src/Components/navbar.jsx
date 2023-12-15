@@ -26,7 +26,7 @@ function  NavBar() {
           <ul className="navbar-nav">
             
             <li className="nav-item">
-              <Link to="/dashboard/Brandprice/Year" className="nav-link">
+              <Link to="/dashboard" className="nav-link">
                 Home
               </Link>
             </li>
