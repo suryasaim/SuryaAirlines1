@@ -59,7 +59,7 @@ function Login() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        'https://localhost:7200/api/Authorization/login',
+        'http://localhost:98/api/Authorization/login',
         formData
       );
 

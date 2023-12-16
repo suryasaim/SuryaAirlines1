@@ -11,13 +11,13 @@ const Schedule = () => {
   useEffect(() => {
     async function fetchSchedules() {
       try {
-        const response = await axios.get('https://localhost:7200/api/Schedule/GetSchedules');
+        const response = await axios.get('http://localhost:98/api/Schedule/GetSchedules');
         const schedulesData = response.data;
 
         // Fetch airport names for source and destination airports
         const airportNamesPromises = schedulesData.map(async (schedule) => {
-          const sourceAirportResponse = await axios.get(`https://localhost:7200/api/Airport/${schedule.sourceAirportId}`);
-          const destinationAirportResponse = await axios.get(`https://localhost:7200/api/Airport/${schedule.destinationAirportId}`);
+          const sourceAirportResponse = await axios.get(`http://localhost:98/api/Airport/${schedule.sourceAirportId}`);
+          const destinationAirportResponse = await axios.get(`http://localhost:98/api/Airport/${schedule.destinationAirportId}`);
 
           const sourceAirportName = sourceAirportResponse.data.airportName;
           const destinationAirportName = destinationAirportResponse.data.airportName;
@@ -77,7 +77,7 @@ const Schedule = () => {
               <th>Duration</th>
         
               <th>Flight Status</th>
-              <th>Seats Available</th>
+              {/* <th>Seats Available</th> */}
               <th>Actions</th>
             </tr>
           </thead>
@@ -119,11 +119,26 @@ const calculateDepartureDateTime = (schedule) => {
   if (!isNaN(flightDuration)) {
     const durationInMillis = flightDuration * 1000; // Convert seconds to milliseconds
     const departureDateTime = new Date(arrivalDateTime.getTime() + durationInMillis);
-    return departureDateTime.toLocaleString();
+
+    // Format options
+    const options = {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    };
+
+    const formattedDepartureDateTime = departureDateTime.toLocaleString('en-GB', options); // Use 'en-GB' for dd/mm/yyyy format
+
+    return formattedDepartureDateTime;
   }
 
   return '';
 };
+
+
 
 // Function to parse flight duration in seconds from hh:mm:ss format
 const parseFlightDuration = (duration) => {

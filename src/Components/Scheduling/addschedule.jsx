@@ -21,11 +21,11 @@ const ScheduleFlights = () => {
   });
 
   useEffect(() => {
-    axios.get('https://localhost:7200/api/Flight/GetFlightdetails')
+    axios.get('http://localhost:98/api/Flight/GetFlightdetails')
       .then(response => setFlightNames(response.data))
       .catch(error => console.error('Error fetching flight names:', error));
 
-    axios.get('https://localhost:7200/api/Airport')
+    axios.get('http://localhost:98/api/Airport')
       .then(response => setAirportNames(response.data))
       .catch(error => console.error('Error fetching airport names:', error));
   }, []);
@@ -89,7 +89,7 @@ const ScheduleFlights = () => {
       };
 
       // Include flightDuration in the API request
-      const response = await axios.post('https://localhost:7200/api/Schedule/CreateSchedule', requestData);
+      const response = await axios.post('http://localhost:98/api/Schedule/CreateSchedule', requestData);
       toast.success('Flight scheduled successfully');
       console.log(response.data);
     } catch (error) {

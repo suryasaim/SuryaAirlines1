@@ -43,7 +43,7 @@ function EditFlight() {
     e.preventDefault();
 
     try {
-      await axios.put(`https://localhost:7200/api/Flight/${id}`, flight);
+      await axios.put(`http://localhost:98/api/Flight/${id}`, flight);
       toast.success('Flight updated successfully');
       //navigate('/admin/Flights/Flights'); // Redirect to Flights page
     } catch (error) {

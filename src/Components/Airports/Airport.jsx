@@ -11,7 +11,7 @@ function Airports() {
   useEffect(() => {
     async function fetchAirports() {
       try {
-        const response = await axios.get('https://localhost:7200/api/Airport');
+        const response = await axios.get('http://localhost:98/api/Airport');
         setAirports(response.data);
       } catch (error) {
         console.error('Error fetching airports:', error);
@@ -23,7 +23,7 @@ function Airports() {
 
   const handleDelete = async (airportId) => {
     try {
-      await axios.delete(`https://localhost:7200/api/Airport/${airportId}`);
+      await axios.delete(`http://localhost:98/api/Airport/${airportId}`);
       // After successful deletion, you can update the airport list or show a success message.
       // For example, you can fetch the updated list of airports.
       const updatedAirports = airports.filter((airport) => airport.airportId !== airportId);

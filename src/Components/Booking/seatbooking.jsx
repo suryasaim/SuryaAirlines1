@@ -46,7 +46,7 @@ const SeatSelection = () => {
         // Set the numberOfPassengers in the component state
         setNumberOfPassengers(parseInt(storedNumberOfPassengers, 10) || 1);
 
-        const response = await fetch(`https://localhost:7200/api/Seats/BySchedule/${bookingInfo.scheduleId}`);
+        const response = await fetch(`http://localhost:98/api/Seats/BySchedule/${bookingInfo.scheduleId}`);
         if (!response.ok) {
           throw new Error('Failed to fetch seats');
         }

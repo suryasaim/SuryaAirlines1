@@ -40,7 +40,7 @@ function EditAirport() {
     e.preventDefault();
 
     try {
-      await axios.put(`https://localhost:7200/api/Airport/${id}`, airport);
+      await axios.put(`http://localhost:98/api/Airport/${id}`, airport);
       toast.success('Airport updated successfully');
       //navigate('/admin/Airports/Airport'); // Redirect to Airports page
     } catch (error) {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -23,10 +24,10 @@ function Registrationuser() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        'http://localhost:5103/api/Authorization/RegistrationUser',
+        'http://localhost:98/api/Authorization/RegistrationUser',
         formData
       );
-      alert('Registration successful');
+      toast.success('Rigistred successfully');
       clearFields();
     } catch (error) {
       alert('Registration failed');

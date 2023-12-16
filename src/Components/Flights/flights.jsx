@@ -11,7 +11,7 @@ function Flights() {
   useEffect(() => {
     async function fetchFlights() {
       try {
-        const response = await axios.get('https://localhost:7200/api/Flight/GetFlightdetails');
+        const response = await axios.get('http://localhost:98/api/Flight/GetFlightdetails');
         setFlights(response.data);
       } catch (error) {
         console.error('Error fetching flights:', error);
@@ -23,7 +23,7 @@ function Flights() {
 
   const handleDelete = async (flightId) => {
     try {
-      await axios.delete(`https://localhost:7200/api/Flight/${flightId}`);
+      await axios.delete(`http://localhost:98/api/Flight/${flightId}`);
       const updatedFlights = flights.filter((flight) => flight.flightId !== flightId);
       setFlights(updatedFlights);
       toast.success('Flight deleted successfully');

@@ -13,8 +13,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 function FindFlights() {
   const [cityNames, setCityNames] = useState([]);
-  const [sourceCity, setSourceCity] = useState('');
-  const [destinationCity, setDestinationCity] = useState('');
+  const [sourceAirportId, setSourceAirportId] = useState('');
+  const [destinationAirportId, setDestinationAirportId] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [availableFlights, setAvailableFlights] = useState([]);
   const navigate = useNavigate();
@@ -22,11 +22,11 @@ function FindFlights() {
   useEffect(() => {
     async function fetchCityNames() {
       try {
-        const response = await axios.get('https://localhost:7200/api/Airport');
-        const cities = response.data.map((airport) => airport.city);
-        setCityNames(cities);
+        const response = await axios.get('https://localhost:98/api/Airport');
+        const airports = response.data;
+        setCityNames(airports);
       } catch (error) {
-        console.error('Error fetching city names:', error);
+        console.error('Error fetching airport data:', error);
       }
     }
 
@@ -35,54 +35,83 @@ function FindFlights() {
 
   const handleSearch = async () => {
     try {
-      const formattedDate = selectedDate.toISOString().split('T')[0];
-
-      const response = await axios.get(
-        `https://localhost:7200/api/FindFlight/GetAvailableFlights?SourceCity=${sourceCity}&DestinationCity=${destinationCity}&Date=${formattedDate}`
+      console.log(sourceAirportId);
+      console.log(destinationAirportId);
+      console.log(cityNames);
+  
+      if (!sourceAirportId || !destinationAirportId) {
+        toast.error('Invalid source or destination airport. Please try again.');
+        return;
+      }
+  
+      const formattedDate = selectedDate.toLocaleDateString('en-CA'); // Format date as 'YYYY-MM-DD'
+  
+      // Save search parameters in localStorage
+      localStorage.setItem('flightSearchParameters', JSON.stringify({
+        sourceAirportId,
+        destinationAirportId,
+        selectedDate: formattedDate,
+      }));
+  
+      const directFlightResponse = await axios.get(
+        `http://localhost:98/api/Integration/directflight/${sourceAirportId}/${destinationAirportId}/${formattedDate}`
       );
-
-      setAvailableFlights(response.data);
+  
+      if (directFlightResponse.data.length > 0) {
+        // Direct flights found
+        setAvailableFlights(directFlightResponse.data);
+        // Save search results in localStorage
+        localStorage.setItem('flightSearchResults', JSON.stringify(directFlightResponse.data));
+      } else {
+        const connectingFlightResponse = await axios.get(
+          `http://localhost:98/api/Integration/connectingflight/${sourceAirportId}/${destinationAirportId}/${formattedDate}`
+        );
+  
+        if (connectingFlightResponse.data.length > 0) {
+          // Connecting flights found
+          setAvailableFlights(connectingFlightResponse.data);
+          // Save search results in localStorage
+          localStorage.setItem('flightSearchResults', JSON.stringify(connectingFlightResponse.data));
+        } else {
+          toast.info('No flights found for the selected route and date.');
+        }
+      }
     } catch (error) {
       console.error('Error fetching available flights:', error);
       toast.error('Error fetching available flights');
     }
   };
+  
 
   const handleBookNow = (scheduleId) => {
-    // Check if the user is authenticated (assumes you have implemented authentication)
     const isAuthenticated = localStorage.getItem('userId') !== null;
-  
+
     if (isAuthenticated) {
-      // If authenticated, store user ID and schedule ID in session storage
       const userId = localStorage.getItem('userId');
       sessionStorage.setItem('bookingInfo', JSON.stringify({ userId, scheduleId }));
-  
-      // Redirect to the booking details page with the schedule ID
       navigate(`/Booking/bookingdetails/${scheduleId}`);
     } else {
-      // If not authenticated, navigate to the login page
-      navigate('/login'); // Update '/login' with your actual login page route
+      navigate('/login');
     }
   };
-  
-  
+
   return (
     <div className="container mt-4">
       <h1 className="mb-4">Find Flights</h1>
       <div className="row">
         <div className="col-md-3">
           <div className="form-group">
-            <label htmlFor="sourceCity">Source City:</label>
+            <label htmlFor="sourceAirport">Source Airport:</label>
             <select
-              id="sourceCity"
+              id="sourceAirport"
               className="form-control"
-              value={sourceCity}
-              onChange={(e) => setSourceCity(e.target.value)}
+              value={sourceAirportId}
+              onChange={(e) => setSourceAirportId(e.target.value)}
             >
-              <option value="">Select Source City</option>
-              {cityNames.map((city, index) => (
-                <option key={index} value={city}>
-                  {city}
+              <option value="">Select Source Airport</option>
+              {cityNames.map((airport, index) => (
+                <option key={index} value={airport.airportId}>
+                  {airport.city}
                 </option>
               ))}
             </select>
@@ -90,17 +119,17 @@ function FindFlights() {
         </div>
         <div className="col-md-3">
           <div className="form-group">
-            <label htmlFor="destinationCity">Destination City:</label>
+            <label htmlFor="destinationAirport">Destination Airport:</label>
             <select
-              id="destinationCity"
+              id="destinationAirport"
               className="form-control"
-              value={destinationCity}
-              onChange={(e) => setDestinationCity(e.target.value)}
+              value={destinationAirportId}
+              onChange={(e) => setDestinationAirportId(e.target.value)}
             >
-              <option value="">Select Destination City</option>
-              {cityNames.map((city, index) => (
-                <option key={index} value={city}>
-                  {city}
+              <option value="">Select Destination Airport</option>
+              {cityNames.map((airport, index) => (
+                <option key={index} value={airport.airportId}>
+                  {airport.city}
                 </option>
               ))}
             </select>
@@ -137,7 +166,6 @@ function FindFlights() {
                         <FontAwesomeIcon icon={faPlane} className="mr-3" style={{ fontSize: '2em' }} />
                         <div>
                           <h5 className="card-title">{flight.flightName}</h5>
-                          {/* Updated lines for "from" and "to" cities */}
                           <p className="card-text text-center">
                             <strong>{flight.sourceCity}</strong> to <strong>{flight.destinationCity}</strong>
                           </p>
