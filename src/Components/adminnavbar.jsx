@@ -5,6 +5,12 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 
 function AdminNavBar() {
+
+  const handleLogout = () => {
+    // Clear user data from local storage
+    localStorage.removeItem('userData');
+  };
+  
   return (
     <nav className="navbar navbar-expand-lg navbar-light fixed-top"style={{ backgroundColor: '#87CEEB' }}>
       <div className="container">
@@ -43,8 +49,8 @@ function AdminNavBar() {
             
           </ul>
           <ul className="navbar-nav ms-auto"> {/* This is for right-aligned items */}
-            <li className="nav-item">
-              <Link to="/" className="nav-link">
+          <li className="nav-item">
+              <Link to="/" className="nav-link" onClick={handleLogout}>
                 Logout
               </Link>
             </li>

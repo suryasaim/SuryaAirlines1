@@ -1,4 +1,3 @@
-// Import necessary dependencies and components
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import DatePicker from 'react-datepicker';
@@ -8,8 +7,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlane } from '@fortawesome/free-solid-svg-icons';
-
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { airlinesapi , SuryaairlineUrl} from '../../Constant';
+
 
 function FindFlights() {
   const [cityNames, setCityNames] = useState([]);
@@ -17,12 +17,14 @@ function FindFlights() {
   const [destinationAirportId, setDestinationAirportId] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [availableFlights, setAvailableFlights] = useState([]);
+  const [connectedFlights, setConnectedFlights] = useState([]);
   const navigate = useNavigate();
+  const [finalIntegratedConnectingFlights,setFinalIntegratedConnectingFlights] =useState([])
 
   useEffect(() => {
     async function fetchCityNames() {
       try {
-        const response = await axios.get('https://localhost:98/api/Airport');
+        const response = await axios.get('http://localhost:98/api/Airport');
         const airports = response.data;
         setCityNames(airports);
       } catch (error) {
@@ -35,54 +37,241 @@ function FindFlights() {
 
   const handleSearch = async () => {
     try {
-      console.log(sourceAirportId);
-      console.log(destinationAirportId);
-      console.log(cityNames);
-  
       if (!sourceAirportId || !destinationAirportId) {
         toast.error('Invalid source or destination airport. Please try again.');
         return;
       }
   
-      const formattedDate = selectedDate.toLocaleDateString('en-CA'); // Format date as 'YYYY-MM-DD'
-  
-      // Save search parameters in localStorage
+      const formattedDate = selectedDate.toISOString().split('T')[0];
       localStorage.setItem('flightSearchParameters', JSON.stringify({
         sourceAirportId,
         destinationAirportId,
         selectedDate: formattedDate,
       }));
+      console.log(sourceAirportId);
+      console.log(destinationAirportId);
+      console.log(formattedDate);
   
-      const directFlightResponse = await axios.get(
-        `http://localhost:98/api/Integration/directflight/${sourceAirportId}/${destinationAirportId}/${formattedDate}`
-      );
+      let directFlightResponse = [];
+      let connectingFlightResponse = [];
   
-      if (directFlightResponse.data.length > 0) {
-        // Direct flights found
-        setAvailableFlights(directFlightResponse.data);
-        // Save search results in localStorage
-        localStorage.setItem('flightSearchResults', JSON.stringify(directFlightResponse.data));
+      // Search for direct flights
+      try {
+        const directResponse = await axios.get(`http://localhost:98/api/Integration/directflight/${sourceAirportId}/${destinationAirportId}/${formattedDate}`);
+        directFlightResponse = directResponse.data;
+        console.log(directFlightResponse);
+      } catch (directError) {
+        console.info('Error fetching direct flights:', directError);
+        toast.info('No Direct flights Available');
+      }
+  
+      // Search for connecting flights
+      try {
+        const connectingResponse = await axios.get(`http://localhost:98/api/Integration/connectingflight/${sourceAirportId}/${destinationAirportId}/${formattedDate}`);
+        connectingFlightResponse = connectingResponse.data;
+        console.log(connectingFlightResponse);
+      } catch (connectingError) {
+        console.info('Error fetching connecting flights:', connectingError);
+        toast.info('No connecting flights Available');
+      }
+  
+      // Set the results for direct flights
+      if (directFlightResponse.length > 0) {
+        setAvailableFlights(directFlightResponse);
+        localStorage.setItem('flightSearchResults', JSON.stringify(directFlightResponse));
       } else {
-        const connectingFlightResponse = await axios.get(
-          `http://localhost:98/api/Integration/connectingflight/${sourceAirportId}/${destinationAirportId}/${formattedDate}`
-        );
+        toast.info('No direct flights found for the selected route and date.');
+        setAvailableFlights([]);
+      }
   
-        if (connectingFlightResponse.data.length > 0) {
-          // Connecting flights found
-          setAvailableFlights(connectingFlightResponse.data);
-          // Save search results in localStorage
-          localStorage.setItem('flightSearchResults', JSON.stringify(connectingFlightResponse.data));
-        } else {
-          toast.info('No flights found for the selected route and date.');
+      // Set the results for connecting flights
+      if (connectingFlightResponse.length > 0) {
+        const integratedConnectingFlights = [];
+      
+        for (const connectingFlight of connectingFlightResponse) {
+          // Search for the second leg of the connecting flight
+          const firstFlightDestinationId = connectingFlight.destinationAirportId;  // Use destinationAirportId instead of sourceAirportId
+          const firstFlightDate = formattedDate;
+      
+          try {
+            
+            const secondFlightResponse = await axios.get(
+              `http://localhost:98/api/Integration/directflight/${firstFlightDestinationId}/${destinationAirportId}/${firstFlightDate}`
+            );
+            console.log(secondFlightResponse)
+            if (secondFlightResponse.data.length > 0) {
+              // Second leg found, integrate both legs
+              integratedConnectingFlights.push({
+                firstLeg: connectingFlight,
+                secondLeg: secondFlightResponse.data[0],
+              });
+            }
+          } catch (secondLegError) {
+            console.error('Error fetching second leg:', secondLegError);
+            toast.error('Error fetching second leg of connecting flight');
+          }
         }
+        console.log(integratedConnectingFlights)
+        setConnectedFlights(integratedConnectingFlights);
+      } else {
+        toast.info('No connecting flights found for the selected route and date.');
+        setConnectedFlights([]);
       }
     } catch (error) {
-      console.error('Error fetching available flights:', error);
-      toast.error('Error fetching available flights');
+      console.error('Error during flight search:', error);
+      toast.error('Error during flight search');
     }
-  };
-  
 
+    const formattedDate = selectedDate.toISOString().split('T')[0];
+    console.log(SuryaairlineUrl);
+    console.log(airlinesapi);
+    console.log(sourceAirportId);
+    console.log(destinationAirportId);
+    console.log(formattedDate);
+    
+    getIntegratedFlightDetails(
+      SuryaairlineUrl,
+      airlinesapi,
+      sourceAirportId,
+      destinationAirportId,
+      formattedDate
+    );
+    };
+    
+    const getIntegratedFlightDetails = async (
+      firstAirlines,
+      secondAirlines,
+      source,
+      destination,
+      dateTime
+) => {
+  const connectionSchedules = [];
+  console.log(dateTime)
+  await Promise.all(
+    Object.entries(firstAirlines).map(
+      async ([firstAirlineName, firstAirline]) => {
+        try {
+          console.log(firstAirline.apiPath, dateTime);
+          console.log(            `${firstAirline.apiPath}Integration/connectingflight/${source}/${destination}/${dateTime}`
+          )
+          const firstResponse = await axios.get(
+            `${firstAirline.apiPath}Integration/connectingflight/${source}/${destination}/${dateTime}`
+          );
+          console.log(firstResponse);
+          const firstFlights = firstResponse.data.map((firstFlight) => ({
+            ...firstFlight,
+            airlineName: firstAirlineName,
+            apiPath: firstAirline.apiPath,
+          }));
+          console.log(firstFlights);
+
+          if (firstFlights && firstFlights.length > 0) {
+            await Promise.all(
+              firstFlights.map(async (firstFlight) => {
+                await Promise.all(
+                  Object.entries(secondAirlines).map(
+                    async ([secondAirlineName, secondAirline]) => {
+                      console.log(secondAirline);
+                      try {
+                        console.log(                          `${secondAirline.apiPath}Integration/directflight/${firstFlight.destinationAirportId}/${destination}/${firstFlight.dateTime}`
+                        )
+                        const secondResponse = await axios.get(
+                          `${secondAirline.apiPath}Integration/directflight/${firstFlight.destinationAirportId}/${destination}/${firstFlight.dateTime}`
+                        );
+
+                        console.log(secondResponse);
+                        const secondFlights = secondResponse.data.map(
+                          (secondFlight) => ({
+                            ...secondFlight,
+                            airlineName: secondAirlineName,
+                            apiPath: secondAirline.apiPath,
+                          })
+                        );
+
+                        if (secondFlights && secondFlights.length > 0) {
+                          console.log(secondFlights);
+                          secondFlights.forEach((secondFlight) => {
+                            const connectionSchedule = {
+                              FirstFlight: firstFlight,
+                              SecondFlight: secondFlights,
+                            };
+                            console.log(connectionSchedule);
+                            connectionSchedules.push(connectionSchedule);
+                          });
+                        }
+                      } catch (error) {
+                        console.error(error);
+                      }
+                    }
+                  )
+                );
+              })
+            );
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    )
+  );
+  console.log(connectionSchedules)
+  setFinalIntegratedConnectingFlights(connectionSchedules); // Uncomment this line if you want to use this data in your application
+};
+
+
+
+{/* <div className="m-5">
+          {finalIntegratedConnectingFlights.map((connection, index) => (
+            <div key={index} className="flex justify-between">
+              <div className="">
+                {connection.SecondFlight.map((flight, i) => (
+                  <div
+                    key={i}
+                    className="flex flex-row-reverse border p-2 hover:cursor-pointer m-5"
+                    onClick={() =>
+                      onClick(flight, connection.FirstFlight, "connectingTrip")
+                    }
+                  >
+                    <div className="p-5">
+                      <ul>
+                        <li>{flight.FlightName}</li>
+                        <li>{flight.SourceAirportId}</li>
+                        <li>{flight.DestinationAirportId}</li>
+                        <li>Flight Duration: {flight.FlightDuration}</li>
+                        <li>
+                          DepartureDate: {flight.DateTime.split("T")[0]}
+                        </li>
+                        <li>
+                          DepartureTime: {flight.DateTime.split("T")[1]}
+                        </li>
+                      </ul>
+                    </div>
+                    <div className="p-5">
+                      <ul>
+                        <li>{connection.FirstFlight.FlightName}</li>
+                        <li>{connection.FirstFlight.SourceAirportId}</li>
+                        <li>{connection.FirstFlight.DestinationAirportId}</li>
+                        <li>
+                          Flight Duration:{" "}
+                          {connection.FirstFlight.FlightDuration}
+                        </li>
+                        <li>
+                          DepartureDate:{" "}
+                          {connection.FirstFlight.DateTime.split("T")[0]}
+                        </li>
+                        <li>
+                          DepartureTime:{" "}
+                          {connection.FirstFlight.DateTime.split("T")[1]}
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div> */}
+  
   const handleBookNow = (scheduleId) => {
     const isAuthenticated = localStorage.getItem('userId') !== null;
 
@@ -93,6 +282,32 @@ function FindFlights() {
     } else {
       navigate('/login');
     }
+  };
+
+  const handleBookNowConnecting = (firstLegScheduleId, secondLegScheduleId) => {
+    const isAuthenticated = localStorage.getItem('userId') !== null;
+  
+    if (isAuthenticated) {
+      const userId = localStorage.getItem('userId');
+      const bookingInfo = { userId, scheduleIds: [firstLegScheduleId, secondLegScheduleId] };
+      sessionStorage.setItem('bookingInfo', JSON.stringify(bookingInfo));
+      navigate(`/ConnectBooking/Connectbookingdetails/${firstLegScheduleId}`);
+    } else {
+      navigate('/login');
+    }
+  };
+
+  const calculateDepartureTime = (arrivalTime, duration) => {
+    const arrivalDateTime = new Date(arrivalTime);
+    const durationParts = duration.split(':');
+    const hours = parseInt(durationParts[0], 10);
+    const minutes = parseInt(durationParts[1], 10);
+
+    const departureDateTime = new Date(arrivalDateTime);
+    departureDateTime.setHours(departureDateTime.getHours() + hours);
+    departureDateTime.setMinutes(departureDateTime.getMinutes() + minutes);
+
+    return departureDateTime;
   };
 
   return (
@@ -154,43 +369,199 @@ function FindFlights() {
         </div>
       </div>
       {availableFlights.length > 0 && (
-        <div className="mt-4">
-          <h2 className="mb-3">Available Flights</h2>
-          <div className="row">
-            {availableFlights.map((flight) => (
-              <div key={flight.scheduleId} className="col-md-12 mb-3">
-                <div className="card">
-                  <div className="card-body">
-                    <div className="d-flex align-items-center justify-content-between mb-3">
-                      <div className="d-flex align-items-center">
-                        <FontAwesomeIcon icon={faPlane} className="mr-3" style={{ fontSize: '2em' }} />
-                        <div>
-                          <h5 className="card-title">{flight.flightName}</h5>
-                          <p className="card-text text-center">
-                            <strong>{flight.sourceCity}</strong> to <strong>{flight.destinationCity}</strong>
-                          </p>
-                        </div>
-                      </div>
-                      <div>
-                        <p className="card-text">
-                          <strong>Date:</strong> {new Date(flight.departureTime).toLocaleDateString()}
-                        </p>
-                        <p className="card-text">
-                          <strong>Time:</strong> {new Date(flight.departureTime).toLocaleTimeString()}
-                        </p>
-                      </div>
-                    </div>
-                    <button onClick={() => handleBookNow(flight.scheduleId)} className="btn btn-primary">
-                      Book Now
-                    </button>
-                  </div>
+  <div className="mt-4">
+    <h2 className="mb-3">Available Flights</h2>
+    <div className="row">
+      {availableFlights.map((flight) => (
+        <div key={flight.scheduleId} className="col-md-12 mb-3">
+          <div className="card">
+            <div className="card-body">
+              <div className="text-center mb-3">
+                <FontAwesomeIcon icon={faPlane} className="mr-2" style={{ fontSize: '2em' }} />
+                <span className="airline-name">{flight.flightName}</span>
+              </div>
+              <div className="d-flex align-items-center justify-content-between mb-3">
+                <div className="text-center">
+                  <p className="card-text">
+                    <strong>From:</strong> {flight.sourceCity} ({flight.sourceAirportName})
+                  </p>
+                  <p className="card-text">
+                    <strong>Arrival Time:</strong>{' '}
+                    {new Date(flight.dateTime).toLocaleString('en-GB')}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="card-text">
+                    <strong>To:</strong> {flight.destinationCity} ({flight.destinationAirportName})
+                  </p>
+                  <p className="card-text">
+                    <strong>Departure Time:</strong>{' '}
+                    {calculateDepartureTime(flight.dateTime, flight.flightDuration).toLocaleString('en-GB')}
+                  </p>
                 </div>
               </div>
-            ))}
+              <div className="text-center">
+                <p className="card-text">
+                  <strong>Duration:</strong> {flight.flightDuration}
+                </p>
+              </div>
+              <button onClick={() => handleBookNow(flight.scheduleId)} className="btn btn-primary mt-3">
+                Book Now
+              </button>
+            </div>
           </div>
         </div>
-      )}
+      ))}
     </div>
+  </div>
+)}
+
+{connectedFlights.length > 0 && (
+  <div className="mt-4">
+    <h2 className="mb-3">Connecting Flights</h2>
+    <div className="row">
+      {connectedFlights.map((connectingFlights, index) => (
+        <div key={index} className="col-md-12 mb-3">
+          <div className="card">
+            <div className="card-body">
+              {/* ... (existing code) */}
+              <div className="text-center mb-3">
+                  <FontAwesomeIcon icon={faPlane} className="mr-2" style={{ fontSize: '2em' }} />
+                  <span className="airline-name">{connectingFlights.firstLeg.flightName}</span>
+              </div>
+                <div className="mt-2" style={{ color: 'blue', fontWeight: 'bold' }}>
+                  <p>First Flight</p>
+                </div>
+
+              {/* Swap the positions of arrival time and departure time for the second leg */}
+              <div className="d-flex align-items-center justify-content-between mb-3">
+                <div className="text-center">
+                  <p className="card-text">
+                    <strong>From:</strong> {connectingFlights.firstLeg.sourceCity} ({connectingFlights.firstLeg.sourceAirportName})
+                  </p>
+                  <p className="card-text">
+                    <strong>Arrival Time:</strong>{' '}
+                    {new Date(connectingFlights.firstLeg.dateTime).toLocaleString('en-GB')}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="card-text">
+                    <strong>To:</strong> {connectingFlights.firstLeg.destinationCity} ({connectingFlights.firstLeg.destinationAirportName})
+                  </p>
+                  <p className="card-text">
+                    <strong>Departure Time:</strong>{' '}
+                    {calculateDepartureTime(connectingFlights.firstLeg.dateTime, connectingFlights.firstLeg.flightDuration).toLocaleString('en-GB')}
+                  </p>
+                </div>
+              </div>
+                
+                {/* Duration for the first leg */}
+                <div className="text-center">
+                  <p className="card-text">
+                    <strong>Duration:</strong> {connectingFlights.firstLeg.flightDuration}
+                  </p>
+                </div>
+
+                {/* Text for the second flight */}
+                <div className="mt-2 mb-0" style={{ color: 'blue', fontWeight: 'bold' }}>
+                  <p>Second Flight</p>
+                </div>
+                {/* Details for the second leg */}
+                <div className="text-center mb-3">
+                  <FontAwesomeIcon icon={faPlane} className="mr-2" style={{ fontSize: '2em' }} />
+                  <span className="airline-name">{connectingFlights.secondLeg.flightName}</span>
+                </div>
+                <div className="d-flex align-items-center justify-content-between mb-3">
+                  <div className="text-center">
+                    <p className="card-text">
+                      <strong>From:</strong> {connectingFlights.secondLeg.sourceCity} ({connectingFlights.secondLeg.sourceAirportName})
+                    </p>
+                    <p className="card-text">
+                      <strong>Arrival Time:</strong> {new Date(connectingFlights.secondLeg.dateTime).toLocaleString('en-GB')}
+                    </p>
+                    
+                  </div>
+                  <div className="text-center">
+                    <p className="card-text">
+                      <strong>To:</strong> {connectingFlights.secondLeg.destinationCity} ({connectingFlights.secondLeg.destinationAirportName})
+                    </p>
+                    <p className="card-text">
+                      <strong>Departure Time:</strong>{' '}
+                      {calculateDepartureTime(connectingFlights.secondLeg.dateTime, connectingFlights.secondLeg.flightDuration).toLocaleString('en-GB')}
+                    </p>
+                    
+                  </div>
+                </div>
+                
+                {/* Duration for the second leg */}
+                <div className="text-center">
+                  <p className="card-text">
+                    <strong>Duration:</strong> {connectingFlights.secondLeg.flightDuration}
+                  </p>
+                </div>
+
+                {/* Book Now button for connected flights */}
+                <button onClick={() => handleBookNowConnecting(connectingFlights.firstLeg.scheduleId, connectingFlights.secondLeg.scheduleId)} className="btn btn-primary mt-3">
+                  Book Now
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+  <div className="container mt-4">
+      <div className="m-5">
+        {finalIntegratedConnectingFlights.map((connection, index) => (
+          <div key={index} className="flex justify-between">
+            <div className="">
+              {connection.SecondFlight.map((flight, i) => (
+                <div
+                  key={i}
+                  className="flex flex-row-reverse border p-2 hover:cursor-pointer m-5"
+                >
+                  <div className="p-5">
+                    <h3>{flight.airlineName}</h3>
+                    <ul>
+                      <li>{flight.flightName}</li>
+                      <li>{flight.sourceAirportName}</li>
+                      <li>{flight.destinationAirportName}</li>
+                      <li>Flight Duration: {flight.flightDuration}</li>
+                      <li>
+                        Departure Date: {flight.dateTime.split("T")[0]}
+                      </li>
+                      <li>
+                        Departure Time: {flight.dateTime.split("T")[1]}
+                      </li>
+                    </ul>
+                  </div>
+                  {/* Render additional details for the second flight if needed */}
+                  <div className="p-5">
+                    <h3>{flight.airlineName}</h3>
+                    <ul>
+                      <li>{flight.flightName}</li>
+                      <li>{flight.sourceAirportName}</li>
+                      <li>{flight.destinationAirportName}</li>
+                      <li>Flight Duration: {flight.flightDuration}</li>
+                      <li>
+                        Departure Date: {flight.dateTime.split("T")[0]}
+                      </li>
+                      <li>
+                        Departure Time: {flight.dateTime.split("T")[1]}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  
+
+</div>
   );
 }
 

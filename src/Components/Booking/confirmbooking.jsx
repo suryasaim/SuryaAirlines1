@@ -88,10 +88,10 @@ const ConfirmBooking = () => {
       // Prepare data for the API request
       const requestData = {
         booking: {
-          bookingId: '3fa85f64-5717-4562-b3fc-2c963f66afa6', // Replace with a unique ID generation logic
+          bookingId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
           status: 'Booked',
-          id: '76a5eb1f-04c6-47ff-ba54-498875f7f8fc', // Replace with the actual user id
-          bookingType: 'OneWay', // Replace with the actual booking type
+          id: confirmationData[0].userId,
+          bookingType: confirmationData[0].bookingType,
         },
         flightTickets: confirmationData.flatMap((user) =>
           user.selectedSeats.map((seat) => ({
@@ -135,61 +135,6 @@ const ConfirmBooking = () => {
     }
   };
 
-  const handleProceed = () => {
-    // Validate selected seats
-    if (selectedSeats.length !== numberOfPassengers) {
-      toast.error(`Please select ${numberOfPassengers} seat${numberOfPassengers > 1 ? 's' : ''}.`);
-      return;
-    }
-
-    // Retrieve booking data from session storage
-    const bookingDataString = sessionStorage.getItem('bookingData');
-    if (!bookingDataString) {
-      toast.error('Invalid bookingData. Please try again.');
-      return;
-    }
-
-    // Parse the booking data
-    let bookingData = JSON.parse(bookingDataString);
-
-    // Assign selected seats to each user
-    bookingData.users.forEach((user, index) => {
-      // Check if there are enough selected seats
-      if (selectedSeats.length <= index) {
-        toast.error('Invalid number of selected seats. Please try again.');
-        return;
-      }
-
-      // Assign a seat to the user
-      user.selectedSeats = [selectedSeats[index]];
-    });
-
-    try {
-      // Save updated booking data to session storage
-      sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
-
-      // Parse the bookingInfo JSON string
-      const bookingInfoString = sessionStorage.getItem('bookingInfo');
-      if (!bookingInfoString) {
-        toast.error('Invalid bookingInfo. Please try again.');
-        return;
-      }
-
-      const bookingInfo = JSON.parse(bookingInfoString);
-
-      // Check if scheduleId is available
-      if (!bookingInfo || !bookingInfo.scheduleId) {
-        toast.error('Invalid scheduleId. Please try again.');
-        return;
-      }
-
-      // Redirect to confirmation page with the correct scheduleId
-      navigate(`/Booking/confirmbooking/${bookingInfo.scheduleId}`);
-    } catch (error) {
-      console.error('Error updating bookingData:', error);
-      toast.error('Error updating bookingData. Please try again.');
-    }
-  };
 
   const handleBack = () => {
     try {

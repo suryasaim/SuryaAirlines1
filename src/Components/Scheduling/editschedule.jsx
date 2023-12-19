@@ -63,7 +63,7 @@ const UpdateSchedule = () => {
       const departureDateTime = calculateDepartureTime();
 
       // Update the schedule with new duration
-      await axios.put(`http://localhost:98/api/Schedule/UpdateSchedule/${id}`, {
+      await axios.patch(`http://localhost:98/api/Schedule/UpdateSchedule/${id}`, {
         ...schedule,
         departureDateTime,
       });

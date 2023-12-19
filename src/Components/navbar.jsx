@@ -39,7 +39,7 @@ function NavBar() {
               </Link>
             </li>
             <li className="nav-item">
-              <Link to="/dashboard/Brandprice/Location" className="nav-link">
+              <Link to="/dashboard/Tickets/tickets" className="nav-link">
                 Bookings
               </Link>
             </li>

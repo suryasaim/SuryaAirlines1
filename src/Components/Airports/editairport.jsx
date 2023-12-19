@@ -18,7 +18,7 @@ function EditAirport() {
   useEffect(() => {
     async function fetchAirport() {
       try {
-        const response = await axios.get(`https://localhost:7200/api/Airport/${id}`);
+        const response = await axios.get(`http://localhost:98/api/Airport/${id}`);
         setAirport(response.data);
       } catch (error) {
         console.error('Error fetching airport:', error);
@@ -40,7 +40,7 @@ function EditAirport() {
     e.preventDefault();
 
     try {
-      await axios.put(`http://localhost:98/api/Airport/${id}`, airport);
+      await axios.patch(`http://localhost:98/api/Airport/${id}`, airport);
       toast.success('Airport updated successfully');
       //navigate('/admin/Airports/Airport'); // Redirect to Airports page
     } catch (error) {
