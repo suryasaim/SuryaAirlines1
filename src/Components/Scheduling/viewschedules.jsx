@@ -78,7 +78,7 @@ const Schedule = () => {
         
               <th>Flight Status</th>
               {/* <th>Seats Available</th> */}
-              <th>Actions</th>
+              {/* <th>Actions</th> */}
             </tr>
           </thead>
           <tbody>
@@ -93,14 +93,14 @@ const Schedule = () => {
                 <td>{schedule.flightDuration}</td>
                 <td>{schedule.isActive ? 'Active' : 'Inactive'}</td>
                 {/* <td>{calculateSeatsAvailable(schedule.seats)}</td> */}
-                <td>
+                {/* <td>
                   <Link to={`/admin/Scheduling/editschedule/${schedule.scheduleId}`} className="btn btn-primary me-2">
                     Update
                   </Link>
                   <button className="btn btn-danger" onClick={() => handleDelete(schedule.scheduleId)}>
                     Delete
                   </button>
-                </td>
+                </td> */}
                 
               </tr>
             ))}

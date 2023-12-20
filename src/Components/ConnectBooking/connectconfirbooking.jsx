@@ -235,7 +235,7 @@ const handleConfirm = async () => {
     sessionStorage.removeItem('numberOfPassengers');
 
     // Redirect to a success page or handle accordingly
-    navigate('/dashboard');
+    navigate('/dashboard/Tickets/tickets');
     toast.success('Tickets Booked Successfully for both schedules');
   } catch (error) {
     console.error('Error confirming booking:', error);

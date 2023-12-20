@@ -9,7 +9,7 @@ const IntegratedConfirmBooking = () => {
   const navigate = useNavigate();
   const [confirmationDataFirstSchedule, setConfirmationDataFirstSchedule] = useState([]);
   const [confirmationDataSecondSchedule, setConfirmationDataSecondSchedule] = useState([]);
-
+  const [integratedconfirmationDataSecondSchedule, setIntegratedConfirmationDataSecondSchedule] = useState([]);
   useEffect(() => {
     try {
       const numberOfPassengers = sessionStorage.getItem('numberOfPassengers');
@@ -22,18 +22,18 @@ const IntegratedConfirmBooking = () => {
         navigate('/dashboard');
         return;
       }
-
+      
       const numberOfPassengersInt = parseInt(numberOfPassengers, 10);
       const selectedSeatsData = JSON.parse(selectedSeatsDataString);
       const bookingData = JSON.parse(bookingDataString);
       const integratedBookingInfo = JSON.parse(integratedBookingInfoString);
-
+    
       // First Schedule
       const usersDataFirstSchedule = bookingData.users.map((user, index) => {
         const selectedSeatsKey = 'selectedSeatsFirstSchedule';
         const selectedSeats = selectedSeatsData[selectedSeatsKey][index];
         const scheduleId = integratedBookingInfo.scheduleIds[0];
-
+        
         return {
           userId: integratedBookingInfo.userId,
           scheduleId: scheduleId,
@@ -47,6 +47,32 @@ const IntegratedConfirmBooking = () => {
       });
 
       setConfirmationDataFirstSchedule(usersDataFirstSchedule);
+
+
+       // First integratedS chedule
+       const usersDataFirstintegratedSchedule = bookingData.users.map((user, index) => {
+        const selectedSeatsKey = 'selectedSeatsFirstSchedule';
+        const selectedSeats = selectedSeatsData[selectedSeatsKey][index];
+        const flightName = integratedBookingInfo.flightnames[0];
+        const sourceAirportId = integratedBookingInfo.sourceAirportIds[0];
+        const destinationAirportId = integratedBookingInfo.destinationAirportIds[0];
+        const airlineName = integratedBookingInfo.airlineNames[0];
+        return {
+          userId: integratedBookingInfo.userId,
+          
+          name: user.name,
+          age: user.age,
+          gender: user.gender,
+          selectedSeats: [selectedSeats],
+          flightName:flightName,
+          flightName: flightName,
+          sourceAirportId: sourceAirportId,
+          destinationAirportId: destinationAirportId,
+          airlineName: airlineName,
+        };
+      });
+
+      setConfirmationDataFirstSchedule(usersDataFirstintegratedSchedule);
 
       // Second Schedule
       const usersDataSecondSchedule = bookingData.users.map((user, index) => {
@@ -151,87 +177,84 @@ const IntegratedConfirmBooking = () => {
 
   const handleConfirm = async () => {
     try {
-      // Confirm logic for the first schedule
-      const requestDataFirstSchedule = {
-        booking: {
-          bookingId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-          status: 'Booked',
-          id: confirmationDataFirstSchedule[0]?.userId,
-          bookingType: confirmationDataFirstSchedule[0]?.bookingType,
-        },
-        flightTickets: confirmationDataFirstSchedule.flatMap((user) =>
-          user.selectedSeats.map((seat) => ({
-            scheduleId: user.scheduleId,
+      const integratedBookingInfoString = sessionStorage.getItem('integratedBookingInfo');
+      if (!integratedBookingInfoString) {
+        toast.error('Invalid integratedBookingInfo. Please try again.');
+        return;
+      }
+  
+      const integratedBookingInfo = JSON.parse(integratedBookingInfoString);
+  
+      if (!integratedBookingInfo || !integratedBookingInfo.apiPaths || integratedBookingInfo.apiPaths.length !== 2) {
+        toast.error('Invalid apiPaths. Please try again.');
+        return;
+      }
+  
+      const confirmationDataArray = [confirmationDataFirstSchedule, confirmationDataSecondSchedule];
+  
+      for (let i = 0; i < 2; i++) {
+        const confirmationData = confirmationDataArray[i];
+        const apiPath = integratedBookingInfo.apiPaths[i];
+  
+        let apiUrl;
+  
+        if (apiPath === 'http://192.168.10.106:98/api/') {
+          apiUrl = 'http://localhost:98/api/Booking/CreateBooking';
+        } else {
+          apiUrl = `${apiPath}/Integration/partnerbooking`;
+        }
+  
+        const requestData = {
+          booking: {
+            bookingId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+            status: 'Booked',
+            id: confirmationData[0]?.userId,
+            bookingType: confirmationData[0]?.bookingType,
+          },
+          flightTickets: confirmationData.flatMap((user) =>
+            user.selectedSeats.map((seat) => ({
+              scheduleId: user.scheduleId,
+              name: user.name,
+              age: user.age,
+              gender: user.gender,
+              seatNo: seat,
+            }))
+          ),
+        };
+
+
+        const integratedrequestData = usersDataFirstintegratedSchedule.map(user => ({
+            bookingId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+            ticketNo: 0, // You may need to adjust this based on your actual data
             name: user.name,
             age: user.age,
             gender: user.gender,
-            seatNo: seat,
-          }))
-        ),
-      };
-
-      // Use Axios to make the POST request for the first schedule
-      const createBookingResponseFirstSchedule = await axios.post(
-        `${integratedBookingInfo.apiPaths[0]}/Integration/partnerbooking`,
-        requestDataFirstSchedule,
-        {
+            seatNo: user.selectedSeats[0], // Assuming only one seat is selected
+            flightName: user.flightName,
+            sourceAirportId: user.sourceAirportId,
+            destinationAirportId: user.destinationAirportId,
+            airlineName: user.airlineName,
+            dateTime: user.dateTime,
+          }));
+  
+        const createBookingResponse = await axios.post(apiUrl, requestData, {
           headers: {
             'Content-Type': 'application/json',
           },
+        });
+  
+        if (!createBookingResponse.data || createBookingResponse.data.error) {
+          throw new Error(`Failed to create booking for schedule ${i + 1}`);
         }
-      );
-
-      if (!createBookingResponseFirstSchedule.data || createBookingResponseFirstSchedule.data.error) {
-        throw new Error('Failed to create booking for the first schedule');
+  
+        sessionStorage.removeItem(`savedData${i === 0 ? 'First' : 'Second'}Schedule`);
       }
-
-      // Clear session storage for the first schedule after successful booking
-      sessionStorage.removeItem('savedDataFirstSchedule');
-
-      // Confirm logic for the second schedule
-      const requestDataSecondSchedule = {
-        booking: {
-          bookingId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-          status: 'Booked',
-          id: confirmationDataSecondSchedule[0]?.userId,
-          bookingType: confirmationDataSecondSchedule[0]?.bookingType,
-        },
-        flightTickets: confirmationDataSecondSchedule.flatMap((user) =>
-          user.selectedSeats.map((seat) => ({
-            scheduleId: user.scheduleId,
-            name: user.name,
-            age: user.age,
-            gender: user.gender,
-            seatNo: seat,
-          }))
-        ),
-      };
-
-      // Use Axios to make the POST request for the second schedule
-      const createBookingResponseSecondSchedule = await axios.post(
-        `${integratedBookingInfo.apiPaths[1]}/Integration/partnerbooking`,
-        requestDataSecondSchedule,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      if (!createBookingResponseSecondSchedule.data || createBookingResponseSecondSchedule.data.error) {
-        throw new Error('Failed to create booking for the second schedule');
-      }
-
-      // Clear session storage for the second schedule after successful booking
-      sessionStorage.removeItem('savedDataSecondSchedule');
-
-      // Clear other session storage items
+  
       sessionStorage.removeItem('bookingData');
       sessionStorage.removeItem('selectedSeatsData');
       sessionStorage.removeItem('integratedBookingInfo');
       sessionStorage.removeItem('numberOfPassengers');
-
-      // Redirect to a success page or handle accordingly
+  
       navigate('/dashboard');
       toast.success('Tickets Booked Successfully for both schedules');
     } catch (error) {
@@ -239,6 +262,7 @@ const IntegratedConfirmBooking = () => {
       toast.error('Error confirming booking');
     }
   };
+  
 
   const handleBack = () => {
     try {

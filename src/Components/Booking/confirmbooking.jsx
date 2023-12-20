@@ -127,7 +127,7 @@ const ConfirmBooking = () => {
       sessionStorage.removeItem('numberOfPassengers');
 
       // Redirect to a success page or handle accordingly
-      navigate('/dashboard');
+      navigate('/dashboard/Tickets/tickets');
       toast.success('Ticket Booked Successfully');
     } catch (error) {
       console.error('Error confirming booking:', error);

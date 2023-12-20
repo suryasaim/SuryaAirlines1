@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -17,6 +16,7 @@ const ScheduleFlights = () => {
     destinationAirportId: '',
     arrivalDateTime: new Date(),
     flightDuration: '', // This field will be entered by the user in the format hh:mm:ss
+    numberOfDays: 1, // New field for the number of days
     // Add other fields as needed
   });
 
@@ -48,13 +48,17 @@ const ScheduleFlights = () => {
   const calculateDepartureDateTime = () => {
     const arrivalDateTime = scheduleData.arrivalDateTime;
     const flightDuration = parseFlightDuration(scheduleData.flightDuration);
-
+  
     if (!isNaN(flightDuration)) {
       const durationInMillis = flightDuration * 1000; // Convert seconds to milliseconds
       const departureDateTime = new Date(arrivalDateTime.getTime() + durationInMillis);
-      return departureDateTime;
+  
+      const formattedDate = departureDateTime.toLocaleDateString('en-GB'); // Format as dd-mm-yyyy
+      const formattedTime = departureDateTime.toLocaleTimeString('en-US', { hour12: false }); // Format as 24-hour time
+  
+      return `${formattedDate} ${formattedTime}`;
     }
-
+  
     return null;
   };
 
@@ -78,23 +82,30 @@ const ScheduleFlights = () => {
     e.preventDefault();
 
     try {
-      // Convert flightName, sourceAirportId, and destinationAirportId to strings
-      const requestData = {
-        ...scheduleData,
-        flightName: String(scheduleData.flightName),
-        sourceAirportId: String(scheduleData.sourceAirportId),
-        destinationAirportId: String(scheduleData.destinationAirportId),
-        flightDuration: formatFlightDuration(parseFlightDuration(scheduleData.flightDuration)),
-        dateTime: formatDateTime(scheduleData.arrivalDateTime),
-      };
+      const numberOfDays = parseInt(scheduleData.numberOfDays, 10);
 
-      // Include flightDuration in the API request
-      const response = await axios.post('http://localhost:98/api/Schedule/CreateSchedule', requestData);
-      toast.success('Flight scheduled successfully');
-      console.log(response.data);
+      for (let i = 0; i < numberOfDays; i++) {
+        const currentDate = new Date(scheduleData.arrivalDateTime);
+        currentDate.setDate(currentDate.getDate() + i);
+
+        // Convert flightName, sourceAirportId, and destinationAirportId to strings
+        const requestData = {
+          ...scheduleData,
+          flightName: String(scheduleData.flightName),
+          sourceAirportId: String(scheduleData.sourceAirportId),
+          destinationAirportId: String(scheduleData.destinationAirportId),
+          flightDuration: formatFlightDuration(parseFlightDuration(scheduleData.flightDuration)),
+          dateTime: formatDateTime(currentDate),
+        };
+        
+        // Include flightDuration in the API request
+        await axios.post('http://localhost:98/api/Schedule/CreateSchedule', requestData);
+      }
+
+      toast.success('Flights scheduled successfully');
     } catch (error) {
-      console.error('Error scheduling flight:', error);
-      toast.error('Error scheduling flight');
+      console.error('Error scheduling flights:', error);
+      toast.info('Schedule Flight At least One Day Before');
     }
   };
 
@@ -185,13 +196,25 @@ const ScheduleFlights = () => {
             />
           </div>
           <div className="col-md-4">
+            <label htmlFor="numberOfDays" className="form-label">Number of Days</label>
+            <input
+              type="number"
+              className="form-control"
+              id="numberOfDays"
+              name="numberOfDays"
+              value={scheduleData.numberOfDays}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="col-md-4">
             <label htmlFor="departureDateTime" className="form-label">Departure Date and Time</label>
             <input
               type="text"
               className="form-control"
               id="departureDateTime"
               name="departureDateTime"
-              value={calculateDepartureDateTime() ? calculateDepartureDateTime().toLocaleString() : ''}
+              value={calculateDepartureDateTime() || ''}
               readOnly
             />
           </div>
