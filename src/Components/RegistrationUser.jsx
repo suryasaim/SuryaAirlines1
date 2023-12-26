@@ -24,7 +24,7 @@ function Registrationuser() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        'http://localhost:98/api/Authorization/RegistrationUser',
+        'http://192.168.10.71:98/api/Authorization/RegistrationUser',
         formData
       );
       toast.success('Registered successfully');
@@ -44,19 +44,8 @@ function Registrationuser() {
     });
   };
 
-  const backgroundImageStyle = {
-    backgroundImage: 'url("path/to/your/image.jpg")', // Replace with the actual path to your image
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    height: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-  };
-
   return (
-    <div style={backgroundImageStyle}>
+    <div style={{ height: '50vh', width: '35vw', margin: 'auto' }}>
       <div className="container mt-5">
         <h1 className="text-center">Surya Airlines</h1>
         <h2 className="text-center">User Registration Form</h2>

@@ -10,6 +10,11 @@ import { faPlane } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { airlinesapi , SuryaairlineUrl} from '../../Constant';
 
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+import ImageSlider from './imageslider';
+
+
 
 function FindFlights() {
   const [cityNames, setCityNames] = useState([]);
@@ -27,7 +32,7 @@ function FindFlights() {
   useEffect(() => {
     async function fetchCityNames() {
       try {
-        const response = await axios.get('http://localhost:98/api/Airport');
+        const response = await axios.get('http://192.168.10.71:98/api/Airport');
         const airports = response.data;
         setCityNames(airports);
       } catch (error) {
@@ -40,11 +45,12 @@ function FindFlights() {
 
   const handleSearch = async () => {
     try {
+
       if (!sourceAirportId || !destinationAirportId) {
         toast.error('Invalid source or destination airport. Please try again.');
         return;
       }
-  
+      
       const formattedDate = selectedDate.toISOString().split('T')[0];
       localStorage.setItem('flightSearchParameters', JSON.stringify({
         sourceAirportId,
@@ -60,7 +66,7 @@ function FindFlights() {
   
       // Search for direct flights
       try {
-        const directResponse = await axios.get(`http://localhost:98/api/Integration/directflight/${sourceAirportId}/${destinationAirportId}/${formattedDate}`);
+        const directResponse = await axios.get(`http://192.168.10.71:98/api/Integration/directflight/${sourceAirportId}/${destinationAirportId}/${formattedDate}`);
         directFlightResponse = directResponse.data;
         console.log(directFlightResponse);
       } catch (directError) {
@@ -70,7 +76,7 @@ function FindFlights() {
   
       // Search for connecting flights
       try {
-        const connectingResponse = await axios.get(`http://localhost:98/api/Integration/connectingflight/${sourceAirportId}/${destinationAirportId}/${formattedDate}`);
+        const connectingResponse = await axios.get(`http://192.168.10.71:98/api/Integration/connectingflight/${sourceAirportId}/${destinationAirportId}/${formattedDate}`);
         connectingFlightResponse = connectingResponse.data;
         console.log(connectingFlightResponse);
       } catch (connectingError) {
@@ -99,7 +105,7 @@ function FindFlights() {
           try {
             
             const secondFlightResponse = await axios.get(
-              `http://localhost:98/api/Integration/directflight/${firstFlightDestinationId}/${destinationAirportId}/${firstFlightDate}`
+              `http://192.168.10.71:98/api/Integration/directflight/${firstFlightDestinationId}/${destinationAirportId}/${firstFlightDate}`
             );
             console.log(secondFlightResponse)
             if (secondFlightResponse.data.length > 0) {
@@ -312,8 +318,10 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
   };
 
   return (
+    
     <div className="container mt-4">
-      <h1 className="mb-4">Find Flights</h1>
+      <ImageSlider />
+      <h1 className="mb-4">Find Your Destination</h1>
       <div className="row">
         <div className="col-md-3">
           <div className="form-group">
@@ -355,12 +363,13 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
           <div className="form-group">
             <label htmlFor="departureDate">Departure Date:</label>
             <DatePicker
-              id="departureDate"
-              selected={selectedDate}
-              onChange={(date) => setSelectedDate(date)}
-              dateFormat="MMMM d, yyyy"
-              className="form-control"
-            />
+             id="departureDate"
+             selected={selectedDate}
+             onChange={(date) => setSelectedDate(date)}
+             dateFormat="MMMM d, yyyy"
+             minDate={new Date(new Date().getTime() + 24 * 60 * 60 * 1000)} // Set minDate to tomorrow
+             className="form-control"
+           />
           </div>
         </div>
         <div className="col-md-3">

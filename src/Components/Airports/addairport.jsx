@@ -26,7 +26,7 @@ function AddAirport() {
     e.preventDefault();
 
     try {
-      await axios.post('http://localhost:98/api/Airport', airport);
+      await axios.post('http://192.168.10.71:98/api/Airport', airport);
       // After successful submission, clear the form fields
       setAirport({
         airportId: '',

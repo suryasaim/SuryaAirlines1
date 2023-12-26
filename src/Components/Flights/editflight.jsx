@@ -16,7 +16,7 @@ function EditFlight() {
   useEffect(() => {
     async function fetchFlight() {
       try {
-        const response = await axios.get(`http://localhost:98/api/Flight/${id}`);
+        const response = await axios.get(`http://192.168.10.71:98/api/Flight/${id}`);
         setFlight(response.data);
       } catch (error) {
         console.error('Error fetching flight:', error);
@@ -43,7 +43,7 @@ function EditFlight() {
     e.preventDefault();
 
     try {
-      await axios.patch(`http://localhost:98/api/Flight/${id}`, flight);
+      await axios.patch(`http://192.168.10.71:98/api/Flight/${id}`, flight);
       toast.success('Flight updated successfully');
       //navigate('/admin/Flights/Flights'); // Redirect to Flights page
     } catch (error) {

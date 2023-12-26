@@ -23,7 +23,7 @@ function AddFlight() {
     e.preventDefault();
 
     try {
-      await axios.post('http://localhost:98/api/Flight/Flightdetails', flight);
+      await axios.post('http://192.168.10.71:98/api/Flight/Flightdetails', flight);
       toast.success('Flight added successfully');
       // After successful submission, clear the form fields
       setFlight({

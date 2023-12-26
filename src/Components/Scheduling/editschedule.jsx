@@ -23,7 +23,7 @@ const UpdateSchedule = () => {
   useEffect(() => {
     async function fetchSchedule() {
       try {
-        const response = await axios.get(`https://localhost:7200/api/Schedule/GetSchedules/${id}`);
+        const response = await axios.get(`http://192.168.10.71:98/api/Schedule/GetSchedules/${id}`);
         const fetchedSchedule = response.data[0];
 
         if (fetchedSchedule && fetchedSchedule.flightName) {
@@ -63,7 +63,7 @@ const UpdateSchedule = () => {
       const departureDateTime = calculateDepartureTime();
 
       // Update the schedule with new duration
-      await axios.patch(`http://localhost:98/api/Schedule/UpdateSchedule/${id}`, {
+      await axios.patch(`http://192.168.10.71:98/api/Schedule/UpdateSchedule/${id}`, {
         ...schedule,
         departureDateTime,
       });

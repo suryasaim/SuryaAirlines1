@@ -11,13 +11,13 @@ const Schedule = () => {
   useEffect(() => {
     async function fetchSchedules() {
       try {
-        const response = await axios.get('http://localhost:98/api/Schedule/GetSchedules');
+        const response = await axios.get('http://192.168.10.71:98/api/Schedule/GetSchedules');
         const schedulesData = response.data;
 
         // Fetch airport names for source and destination airports
         const airportNamesPromises = schedulesData.map(async (schedule) => {
-          const sourceAirportResponse = await axios.get(`http://localhost:98/api/Airport/${schedule.sourceAirportId}`);
-          const destinationAirportResponse = await axios.get(`http://localhost:98/api/Airport/${schedule.destinationAirportId}`);
+          const sourceAirportResponse = await axios.get(`http://192.168.10.71:98/api/Airport/${schedule.sourceAirportId}`);
+          const destinationAirportResponse = await axios.get(`http://192.168.10.71:98/api/Airport/${schedule.destinationAirportId}`);
 
           const sourceAirportName = sourceAirportResponse.data.airportName;
           const destinationAirportName = destinationAirportResponse.data.airportName;

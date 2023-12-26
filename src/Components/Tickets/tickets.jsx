@@ -19,13 +19,13 @@ const TicketDetails = () => {
         }
   
         // Fetch ticket details using the FlightTicket API
-        const response = await axios.get(`http://localhost:98/api/FlightTicket/flighttickets/${userId}`);
+        const response = await axios.get(`http://192.168.10.71:98/api/FlightTicket/flighttickets/${userId}`);
         const tickets = response.data;
   
         // Fetch schedule details for each ticket
         const ticketDetailsWithSchedule = await Promise.all(
           tickets.map(async (ticket) => {
-            const scheduleResponse = await axios.get(`http://localhost:98/api/Schedule/GetSchedules/${ticket.scheduleId}`);
+            const scheduleResponse = await axios.get(`http://192.168.10.71:98/api/Schedule/GetSchedules/${ticket.scheduleId}`);
             const schedule = scheduleResponse.data;
   
             return { ...ticket, schedule };
@@ -70,7 +70,7 @@ const TicketDetails = () => {
       // Check if the ticket can be canceled (arrival time is after 24 hours)
       if (ticketArrivalDateTime > currentDateTime.getTime() + 24 * 60 * 60 * 1000) {
         // Implement cancellation logic here
-        const response = await axios.patch(`http://localhost:98/api/FlightTicket/DeleteTicket/${ticketNo}`);
+        const response = await axios.patch(`http://192.168.10.71:98/api/FlightTicket/DeleteTicket/${ticketNo}`);
         console.log(response.data); // Log the cancellation response
 
         // Reload ticket details after cancellation (you may want to fetch fresh data)
@@ -96,7 +96,7 @@ const TicketDetails = () => {
       // Check if the booking can be canceled (departure time is after 24 hours)
       if (departureDateTime > currentDateTime.getTime() + 24 * 60 * 60 * 1000) {
         // Implement booking cancellation logic here
-        const response = await axios.patch(`http://localhost:98/api/Booking/DeleteBooking/${bookingId}`);
+        const response = await axios.patch(`http://192.168.10.71:98/api/Booking/DeleteBooking/${bookingId}`);
         console.log(response.data); // Log the cancellation response
 
         // Reload ticket details after cancellation (you may want to fetch fresh data)
@@ -141,7 +141,7 @@ const sortedBookingIds = Object.keys(groupedTickets).sort(
           const tickets = groupedTickets[bookingId];
           const departureDateTime = tickets[0].schedule.dateTime;
           const arrivalDateTime = calculateDestinationTime(departureDateTime, tickets[0].schedule.flightDuration);
-  
+
           return (
             <div key={bookingId} className="card mb-3">
               <div className="card-header">Booking ID: {bookingId}</div>
@@ -174,10 +174,10 @@ const sortedBookingIds = Object.keys(groupedTickets).sort(
                 </div>
               </div>
               <div className="card-footer">
-              <button className="btn btn-danger" onClick={() => cancelBooking(bookingId, groupedTickets[bookingId][0].schedule.dateTime)}>
-                Cancel Booking
-              </button>
-            </div>
+                <button className="btn btn-danger" onClick={() => cancelBooking(bookingId, groupedTickets[bookingId][0].schedule.dateTime)}>
+                  Cancel Booking
+                </button>
+              </div>
             </div>
           );
         })}

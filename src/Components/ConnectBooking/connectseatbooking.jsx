@@ -43,13 +43,13 @@ const ConnectSeatBooking = () => {
         const storedNumberOfPassengers = sessionStorage.getItem('numberOfPassengers');
         setNumberOfPassengers(parseInt(storedNumberOfPassengers, 10) || 1);
 
-        const firstResponse = await fetch(`http://localhost:98/api/Seats/BySchedule/${bookingInfo.scheduleIds[0]}`);
+        const firstResponse = await fetch(`http://192.168.10.71:98/api/Seats/BySchedule/${bookingInfo.scheduleIds[0]}`);
         if (!firstResponse.ok) {
           throw new Error('Failed to fetch seats for the first schedule');
         }
         const firstData = await firstResponse.json();
 
-        const secondResponse = await fetch(`http://localhost:98/api/Seats/BySchedule/${bookingInfo.scheduleIds[1]}`);
+        const secondResponse = await fetch(`http://192.168.10.71:98/api/Seats/BySchedule/${bookingInfo.scheduleIds[1]}`);
         if (!secondResponse.ok) {
           throw new Error('Failed to fetch seats for the second schedule');
         }

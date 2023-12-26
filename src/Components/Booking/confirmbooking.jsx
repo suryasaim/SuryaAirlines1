@@ -106,7 +106,7 @@ const ConfirmBooking = () => {
 
       // Use Axios to make the POST request
       const createBookingResponse = await axios.post(
-        'http://localhost:98/api/Booking/CreateBooking',
+        'http://192.168.10.71:98/api/Booking/CreateBooking',
         requestData,
         {
           headers: {

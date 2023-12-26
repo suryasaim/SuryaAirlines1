@@ -8,9 +8,15 @@ function AdminNavBar() {
 
   const handleLogout = () => {
     // Clear user data from local storage
-    localStorage.removeItem('userData');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('lastActivityTimestamp');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('flightSearchResults');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('flightSearchParameters');
+
   };
-  
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light fixed-top"style={{ backgroundColor: '#87CEEB' }}>
       <div className="container">

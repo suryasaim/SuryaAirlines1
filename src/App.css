@@ -3,6 +3,14 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  height: 100vh; /* Set the height to 100% of the viewport height */
+  width:100vw;
+  overflow: auto;
+
+  background-image: url('https://c4.wallpaperflare.com/wallpaper/1017/525/123/the-sky-aviation-the-plane-background-wallpaper-preview.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .logo {

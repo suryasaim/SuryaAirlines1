@@ -59,7 +59,7 @@ function Login() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        'http://localhost:98/api/Authorization/login',
+        'http://192.168.10.71:98/api/Authorization/login',
         formData
       );
 
@@ -108,7 +108,7 @@ function Login() {
   };
 
   return (
-    <div className="container mt-5">
+    <div className="container mt-5" style={{ width: '30vw' }}>
       <h2>Login Form</h2>
       <form onSubmit={handleLogin}>
         <div className="mb-3">
@@ -131,12 +131,19 @@ function Login() {
             onChange={handleInputChange}
           />
         </div>
-        <button type="submit" className="btn btn-primary">
-          Login
-        </button>
-        <Link to="/" className="btn btn-warning ml-2">
-          Back to Registration
-        </Link>
+        <div className="d-flex justify-content-center">
+          <button type="submit" className="btn btn-primary">
+            Login
+          </button>
+          <div>
+            <Link to="/dashboard" className="btn btn-success">
+              Continue Without Login
+            </Link>
+            <Link to="/" className="btn btn-warning mt-2">
+              Back to Registration
+            </Link>
+          </div>
+        </div>
       </form>
     </div>
   );

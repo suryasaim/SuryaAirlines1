@@ -40,7 +40,7 @@ function EditAirport() {
     e.preventDefault();
 
     try {
-      await axios.patch(`http://localhost:98/api/Airport/${id}`, airport);
+      await axios.patch(`http://192.168.10.71:98/api/Airport/${id}`, airport);
       toast.success('Airport updated successfully');
       //navigate('/admin/Airports/Airport'); // Redirect to Airports page
     } catch (error) {

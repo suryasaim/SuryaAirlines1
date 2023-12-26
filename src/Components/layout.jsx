@@ -2,6 +2,7 @@ import React from 'react';
 import NavBar from './navbar';
 import Footer from './Footer';
 import '@fortawesome/fontawesome-free/css/all.css';
+
 function Layout({ children }) {
   return (
     <div>

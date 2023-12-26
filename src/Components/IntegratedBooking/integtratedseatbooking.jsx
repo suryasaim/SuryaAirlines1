@@ -46,7 +46,7 @@ const IntegratedSeatBooking = () => {
           setNumberOfPassengers(parseInt(storedNumberOfPassengers, 10) || 1);
   
           // Fetch seats for the first schedule
-          const firstResponse = await fetch(`http://localhost:98/api/Seats/BySchedule/${integratedBookingInfo.scheduleIds[0]}`);
+          const firstResponse = await fetch(`http://192.168.10.71:98/api/Seats/BySchedule/${integratedBookingInfo.scheduleIds[0]}`);
           let firstData;
           console.log(firstResponse)
           // Check if the first API response is okay
@@ -65,7 +65,7 @@ const IntegratedSeatBooking = () => {
           }
   
           // Fetch seats for the second schedule
-          const secondResponse = await fetch(`http://localhost:98/api/Seats/BySchedule/${integratedBookingInfo.scheduleIds[1]}`);
+          const secondResponse = await fetch(`http://192.168.10.71:98/api/Seats/BySchedule/${integratedBookingInfo.scheduleIds[1]}`);
           let secondData;
           console.log(secondResponse)
           // Check if the second API response is okay

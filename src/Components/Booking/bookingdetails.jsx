@@ -110,7 +110,7 @@ const BookingDetails = () => {
       <form>
         {users.map((user, index) => (
           <div key={index} className="mb-3">
-            <h5>User {index + 1}</h5>
+            <h5>Passenger {index + 1}</h5>
             <div className="row">
               <div className="col-md-4">
                 <label htmlFor={`name${index}`} className="form-label">

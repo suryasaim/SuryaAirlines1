@@ -294,7 +294,7 @@ const IntegratedConfirmBooking = () => {
       // Use Axios to make the POST request for the first schedule
       try {
         createBookingResponseFirstSchedule = await axios.post(
-          'http://localhost:98/api/ConnectingBooking/CreateBooking',
+          'http://192.168.10.71:98/api/ConnectingBooking/CreateBooking',
           requestDataFirstSchedule,
           {
             headers: {

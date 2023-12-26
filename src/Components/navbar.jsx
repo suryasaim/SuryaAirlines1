@@ -6,7 +6,13 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 function NavBar() {
   const handleLogout = () => {
     // Clear user data from local storage
-    localStorage.removeItem('userData');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('lastActivityTimestamp');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('flightSearchResults');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('flightSearchParameters');
+
   };
 
   return (
