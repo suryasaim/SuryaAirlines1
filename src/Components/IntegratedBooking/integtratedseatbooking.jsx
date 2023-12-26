@@ -179,7 +179,7 @@ const IntegratedSeatBooking = () => {
 
   return (
     <Layout>
-      <Container>
+      <Container style={{ width: '60vw', height: '90vh' }}>
         <h2 className="mt-4 mb-4">Connecting Seat Selection</h2>
         <h2 className="mt-4 mb-4">First Flight Seat Selection</h2>
         <Row xs={2} md={3} lg={6} className="mb-4">

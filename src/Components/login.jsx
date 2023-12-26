@@ -109,7 +109,7 @@ function Login() {
 
   return (
     <div className="container mt-5" style={{ width: '30vw' }}>
-      <h2>Login Form</h2>
+      <h3>Login Form</h3>
       <form onSubmit={handleLogin}>
         <div className="mb-3">
           <input

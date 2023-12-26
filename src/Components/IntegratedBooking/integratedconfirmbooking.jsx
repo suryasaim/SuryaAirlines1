@@ -404,15 +404,15 @@ const IntegratedConfirmBooking = () => {
   return (
     <Layout>
       <div className="container mt-4">
-        <h1>Confirmation Page</h1>
+        <h2>Confirmation Page</h2>
 
         {/* Display user details for the first schedule in a table */}
-        <h2>First Schedule</h2>
+        <h3>First Flight</h3>
         <table className="table">
           <thead>
             <tr>
-              <th>User ID</th>
-              <th>Schedule ID</th>
+              {/* <th>User ID</th>
+              <th>Schedule ID</th> */}
               <th>Name</th>
               <th>Age</th>
               <th>Gender</th>
@@ -423,8 +423,8 @@ const IntegratedConfirmBooking = () => {
           <tbody>
             {confirmationDataFirstSchedule.map((user, index) => (
               <tr key={index}>
-                <td>{user.userId}</td>
-                <td>{user.scheduleId}</td>
+                {/* <td>{user.userId}</td>
+                <td>{user.scheduleId}</td> */}
                 <td>{user.name}</td>
                 <td>{user.age}</td>
                 <td>{user.gender}</td>
@@ -436,12 +436,12 @@ const IntegratedConfirmBooking = () => {
         </table>
 
         {/* Display user details for the second schedule in a table */}
-        <h2>Second Flight</h2>
+        <h3>Second Flight</h3>
         <table className="table">
           <thead>
             <tr>
-              <th>User ID</th>
-              <th>Schedule ID</th>
+              {/* <th>User ID</th>
+              <th>Schedule ID</th> */}
               <th>Name</th>
               <th>Age</th>
               <th>Gender</th>
@@ -452,8 +452,8 @@ const IntegratedConfirmBooking = () => {
           <tbody>
           {confirmationDataSecondSchedule.map((user, index) => (
               <tr key={index}>
-                <td>{user.userId}</td>
-                <td>{user.scheduleId}</td>
+                {/* <td>{user.userId}</td>
+                <td>{user.scheduleId}</td> */}
                 <td>{user.name}</td>
                 <td>{user.age}</td>
                 <td>{user.gender}</td>
@@ -466,15 +466,16 @@ const IntegratedConfirmBooking = () => {
 
         {/* Buttons */}
         <div className="mt-4 d-flex justify-content-between">
+          <Button variant="danger" onClick={handleBack}>
+            Back
+          </Button>
           <Button variant="secondary" className="mr-2" onClick={handleSave}>
             Save
           </Button>
           <Button variant="primary" className="mr-2" onClick={handleConfirm}>
             Confirm
           </Button>
-          <Button variant="danger" onClick={handleBack}>
-            Back
-          </Button>
+          
         </div>
       </div>
     </Layout>

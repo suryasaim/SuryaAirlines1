@@ -163,15 +163,15 @@ const ConfirmBooking = () => {
   // Render confirmation page with fetched data
   return (
     <Layout>
-      <div className="container mt-4">
-        <h1>Confirmation Page</h1>
+      <div className="container mt-4" style={{ width: '60vw' }}>
+        <h2>Confirmation Page</h2>
 
         {/* Display user details in a table */}
         <table className="table">
           <thead>
             <tr>
-              <th>User ID</th>
-              <th>Schedule ID</th>
+              {/* <th>User ID</th>
+              <th>Schedule ID</th> */}
               <th>Name</th>
               <th>Age</th>
               <th>Gender</th>
@@ -182,8 +182,8 @@ const ConfirmBooking = () => {
           <tbody>
             {confirmationData.map((user, index) => (
               <tr key={index}>
-                <td>{user.userId}</td>
-                <td>{user.scheduleId}</td>
+                {/* <td>{user.userId}</td>
+                <td>{user.scheduleId}</td> */}
                 <td>{user.name}</td>
                 <td>{user.age}</td>
                 <td>{user.gender}</td>
@@ -196,15 +196,16 @@ const ConfirmBooking = () => {
 
         {/* Buttons */}
         <div className="mt-4 d-flex justify-content-between">
+          <Button variant="danger" onClick={handleBack}>
+            Back
+          </Button>
           <Button variant="secondary" className="mr-2" onClick={handleSave}>
             Save
           </Button>
           <Button variant="primary" className="mr-2" onClick={handleConfirm}>
             Confirm
           </Button>
-          <Button variant="danger" onClick={handleBack}>
-            Back
-          </Button>
+          
         </div>
       </div>
     </Layout>

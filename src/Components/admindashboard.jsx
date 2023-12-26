@@ -15,7 +15,7 @@ import AdminLayout from './adminlayout';
 function AdminDashboard() {
   return (
     <AdminLayout>
-      <div style={backgroundImageStyle}>
+      <div >
         {/* Your admin dashboard content */}
       </div>
     </AdminLayout>

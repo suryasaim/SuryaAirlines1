@@ -107,7 +107,7 @@ const IntegratedBookingDetails = () => {
 
   return (
     <Layout>
-    <div className="container mt-4">
+    <div className="container mt-4" style={{ width: '40vw' }}>
       <h1>Booking Details</h1>
       <form>
         {users.map((user, index) => (

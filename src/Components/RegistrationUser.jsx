@@ -47,8 +47,8 @@ function Registrationuser() {
   return (
     <div style={{ height: '50vh', width: '35vw', margin: 'auto' }}>
       <div className="container mt-5">
-        <h1 className="text-center">Surya Airlines</h1>
-        <h2 className="text-center">User Registration Form</h2>
+        <h2 className="text-center">Surya Airlines</h2>
+        <h3 className="text-center">User Registration Form</h3>
         <form onSubmit={handleRegistration}>
           <div className="mb-3">
             <input

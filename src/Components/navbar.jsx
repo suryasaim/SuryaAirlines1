@@ -39,11 +39,11 @@ function NavBar() {
                 Home
               </Link>
             </li>
-            <li className="nav-item">
+            {/* <li className="nav-item">
               <Link to="/dashboard/Brandprice/Modelprice" className="nav-link">
                 About
               </Link>
-            </li>
+            </li> */}
             <li className="nav-item">
               <Link to="/dashboard/Tickets/tickets" className="nav-link">
                 Bookings
