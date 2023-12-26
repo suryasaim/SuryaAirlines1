@@ -23,7 +23,7 @@ const ImageSlider = () => {
   ];
 
   return (
-    <div className="slider-container" style={{ height: '70vh', overflow: 'hidden' }}>
+    <div className="slider-container" style={{ height: '90vh', overflow: 'hidden' }}>
       <Slider {...settings}>
         {imageUrls.map((imageUrl, index) => (
           <div key={index}>

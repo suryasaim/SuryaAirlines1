@@ -321,7 +321,7 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
     
     <div className="container mt-4">
       <ImageSlider />
-      <h1 className="mb-4">Find Your Destination</h1>
+      <h2 className="mb-4">Find Your Destination</h2>
       <div className="row">
         <div className="col-md-3">
           <div className="form-group">
@@ -427,7 +427,7 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
 )}
 
 {connectedFlights.length > 0 && (
-  <div className="mt-4">
+  <div className="mt-4" >
     <h2 className="mb-3">Connecting Flights</h2>
     <div className="row">
       {connectedFlights.map((connectingFlights, index) => (
@@ -522,7 +522,7 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
     </div>
   )}
 
-<div className="container mt-4">
+<div className="container mt-4 bg-white">
   <div className="m-5">
     {finalIntegratedConnectingFlights.map((connection, index) => (
       <div key={index} className="flex justify-between">
