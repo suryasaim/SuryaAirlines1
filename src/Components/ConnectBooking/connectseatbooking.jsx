@@ -161,8 +161,8 @@ const ConnectSeatBooking = () => {
   return (
     <Layout>
       <Container style={{ width: '60vw',background: 'rgba(255, 255, 255, 0.8)', }}>
-        <h2 className="mt-4 mb-4">Connecting Seat Selection</h2>
-        <h3 className="mt-4 mb-4">First Flight Seat Selection</h3>
+        <h2 className="mt-4 mb-4">Select Your Seats</h2>
+        <h3 className="mt-4 mb-4">First Flight Seats</h3>
         <Row xs={2} md={3} lg={6} className="mb-4">
           {availableSeats.firstFlightSeats.map((seat) => (
             <Col key={seat.seatNumber}>
@@ -178,7 +178,7 @@ const ConnectSeatBooking = () => {
             </Col>
           ))}
         </Row>
-        <h3 className="mt-4 mb-4">Second Flight Seat Selection</h3>
+        <h3 className="mt-4 mb-4">Second Flight Seats</h3>
         <Row xs={2} md={3} lg={6} className="mb-4">
           {availableSeats.secondFlightSeats.map((seat) => (
             <Col key={seat.seatNumber}>

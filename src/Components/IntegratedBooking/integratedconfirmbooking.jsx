@@ -507,10 +507,10 @@ const IntegratedConfirmBooking = () => {
   return (
     <Layout>
       <div className="container mt-4" style={{ width: '60vw' }}>
-        <h2>Confirmation Page</h2>
+        <h2>Confirm Your Booking</h2>
 
         {/* Display user details for the first schedule in a table */}
-        <h3>First Flight</h3>
+        <h3>First Flight Details</h3>
         <table className="table">
           <thead>
             <tr>
@@ -539,7 +539,7 @@ const IntegratedConfirmBooking = () => {
         </table>
 
         {/* Display user details for the second schedule in a table */}
-        <h3>Second Flight</h3>
+        <h3>Second Flight Details</h3>
         <table className="table">
           <thead>
             <tr>

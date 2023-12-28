@@ -168,7 +168,7 @@ const ConfirmBooking = () => {
   return (
     <Layout>
       <div className="container mt-4" style={{ width: '60vw' }}>
-        <h2>Confirmation Page</h2>
+        <h2>Confirm Your Booking</h2>
 
         {/* Display user details in a table */}
         <table className="table">

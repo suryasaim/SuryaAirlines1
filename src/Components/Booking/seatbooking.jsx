@@ -164,7 +164,7 @@ const SeatSelection = () => {
   return (
     <Layout>
       <Container  style={{ width: '60vw',background: 'rgba(255, 255, 255, 0.8)', }}>
-        <h2 className="mt-4 mb-4">Seat Selection</h2>
+        <h2 className="mt-4 mb-4">Seat Your Seats</h2>
         <Row xs={2} md={3} lg={6} className="mb-4">
           {availableSeats.map((seat) => (
             <Col key={seat.seatNumber}>

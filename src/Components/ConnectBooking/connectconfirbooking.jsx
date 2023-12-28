@@ -263,8 +263,8 @@ const ConnectConfirmBooking = () => {
 
   return (
     <Layout>
-      <div className="container mt-4" style={{ width: '60vw' }}>
-        <h2>Confirmation Page</h2>
+      <div className="container mt-4" style={{ width: '50vw' }}>
+        <h2>Confirm Your Booking</h2>
 
         {/* Display user details for the first schedule in a table */}
         <h3>First Schedule</h3>

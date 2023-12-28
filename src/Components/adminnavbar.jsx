@@ -56,9 +56,16 @@ function AdminNavBar() {
                 Scheduling
               </Link>
             </li>
+
             
           </ul>
+          
           <ul className="navbar-nav ms-auto"> {/* This is for right-aligned items */}
+          <li className="nav-item">
+              <Link to="/login" className="nav-link">
+                Login
+              </Link>
+            </li>
           <li className="nav-item">
               <Link to="/" className="nav-link" onClick={handleLogout}>
                 Logout

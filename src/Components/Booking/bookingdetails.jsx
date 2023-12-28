@@ -5,7 +5,7 @@ import Layout from '../layout';
 
 const BookingDetails = () => {
   const [users, setUsers] = useState([{ name: '', age: '', gender: '' }]);
-  const [bookingType, setBookingType] = useState('');
+  const [bookingType, setBookingType] = useState('ONEWAY'); // Set "One Way" as the default booking type
   const navigate = useNavigate();
   const { scheduleId } = useParams();
 
@@ -38,8 +38,6 @@ const BookingDetails = () => {
     }
   }, [navigate]);
   
-  
-
   const handleAddUser = () => {
     setUsers((prevUsers) => [...prevUsers, { name: '', age: '', gender: '' }]);
   };
@@ -100,13 +98,10 @@ const BookingDetails = () => {
     }
   };
   
-  
-  
-
   return (
     <Layout>
     <div className="container mt-4" style={{ width: '40vw' }}>
-      <h1>Booking Details</h1>
+      <h2>Booking Details</h2>
       <form>
         {users.map((user, index) => (
           <div key={index} className="mb-3">
@@ -160,7 +155,7 @@ const BookingDetails = () => {
             )}
           </div>
         ))}
-        <div className="mb-3">
+        {/* <div className="mb-3">
           <label htmlFor="bookingType" className="form-label">
             Booking Type:
           </label>
@@ -170,11 +165,10 @@ const BookingDetails = () => {
             value={bookingType}
             onChange={(e) => setBookingType(e.target.value)}
           >
-            <option value="">Select Booking Type</option>
             <option value="ONEWAY">One Way</option>
             <option value="ROUNDTRIP">Round Trip</option>
           </select>
-        </div>
+        </div> */}
         <div className="row">
           <div className="col">
             <button type="button" className="btn btn-primary" onClick={handleAddUser}>

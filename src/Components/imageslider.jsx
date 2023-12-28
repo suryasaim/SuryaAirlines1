@@ -32,10 +32,10 @@ const ImageSlider = () => {
       imageUrl: 'https://www.yatra.com/ythomepagecms/media/imagemanager/2019/Dec/81f8c45e11fc69990887380531d8170b.jpg',
       size: { width: '100%', height: '100%' },
     },
-    {
-      imageUrl: 'https://offercdn.paytm.com/blog/2021/12/welcomeflight-tnc-app.png',
-      size: { width: '100%', height: '100%' },
-    },
+    // {
+    //   imageUrl: 'https://offercdn.paytm.com/blog/2021/12/welcomeflight-tnc-app.png',
+    //   size: { width: '100%', height: '100%' },
+    // },
   ];
 
   return (

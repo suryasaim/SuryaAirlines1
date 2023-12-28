@@ -386,7 +386,7 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
         <div key={flight.scheduleId} className="col-md-12 mb-3">
           <div className="card">
             <div className="card-body">
-              <div className="text-center mb-3">
+              <div className="text-center mb-3 text-success fs-5">
                 <FontAwesomeIcon icon={faPlane} className="mr-2" style={{ fontSize: '2em' }} />
                 <span className="airline-name">{flight.flightName}</span>
               </div>
