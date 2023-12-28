@@ -104,7 +104,7 @@ const IntegratedBookingDetails = () => {
   
   return (
     <Layout>
-    <div className="container mt-4" style={{ width: '40vw' }}>
+    <div className="container mt-4 p-3 bg-white" style={{ width: '50vw', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'}}>
       <h2>Booking Details</h2>
       <form>
         {users.map((user, index) => (
@@ -159,7 +159,7 @@ const IntegratedBookingDetails = () => {
             )}
           </div>
         ))}
-        <div className="mb-3">
+        {/* <div className="mb-3">
           <label htmlFor="bookingType" className="form-label">
             Booking Type:
           </label>
@@ -172,7 +172,7 @@ const IntegratedBookingDetails = () => {
             <option value="ONEWAY">One Way</option>
             <option value="ROUNDTRIP">Round Trip</option>
           </select>
-        </div>
+        </div> */}
         <div className="row">
           <div className="col">
             <button type="button" className="btn btn-info" onClick={handleBack}>

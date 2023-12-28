@@ -63,7 +63,7 @@ const SeatSelection = () => {
         setAvailableSeats(data);
       } catch (error) {
         console.error(error);
-        toast.error('Error fetching seats');
+        toast.info('Session Expired please Login Again');
       }
     };
 
@@ -158,7 +158,7 @@ const SeatSelection = () => {
   };
 
   const getSeatVariant = (seat) => {
-    return selectedSeats.includes(seat.seatNumber) ? 'primary' : seat.status === 'Booked' ? 'danger' : 'success';
+    return selectedSeats.includes(seat.seatNumber) ? 'primary' : seat.status === 'Booked' ? 'danger' : 'outline-success';
   };
 
   return (

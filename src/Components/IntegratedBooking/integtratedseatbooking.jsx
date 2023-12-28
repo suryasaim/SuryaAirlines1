@@ -111,7 +111,7 @@ const IntegratedSeatBooking = () => {
         });
       } catch (error) {
         console.error(error);
-        toast.error('Error fetching seats');
+        toast.info('Session Expired please Login Again');
       }
     };
   

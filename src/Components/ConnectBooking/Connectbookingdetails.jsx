@@ -120,7 +120,9 @@ const ConnectBookingDetails = () => {
 
   return (
     <Layout>
-    <div className="container mt-4" style={{ width: '45vw' }}>
+  <div className='mt-4'>    
+   <div className="container mt-4 p-3 bg-white" style={{ width: '50vw', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'}}>  
+    <div >
       <h2>Booking Details</h2>
       <form>
         {users.map((user, index) => (
@@ -209,6 +211,8 @@ const ConnectBookingDetails = () => {
         </div>
       </form>
     </div>
+  </div>  
+ </div> 
     </Layout>
   );
 };

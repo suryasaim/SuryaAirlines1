@@ -24,6 +24,8 @@ function FindFlights() {
   const [availableFlights, setAvailableFlights] = useState([]);
   const [connectedFlights, setConnectedFlights] = useState([]);
   const [bookingInfo, setBookingInfo] = useState(null);
+  const [bookingType, setBookingType] = useState('One Way');
+
 
 
   const navigate = useNavigate();
@@ -46,6 +48,8 @@ function FindFlights() {
   const handleSearch = async () => {
     try {
 
+      
+
       if (!sourceAirportId || !destinationAirportId) {
         toast.error('Invalid source or destination airport. Please try again.');
         return;
@@ -56,6 +60,7 @@ function FindFlights() {
         sourceAirportId,
         destinationAirportId,
         selectedDate: formattedDate,
+        bookingType,
       }));
       console.log(sourceAirportId);
       console.log(destinationAirportId);
@@ -130,7 +135,7 @@ function FindFlights() {
       console.error('Error during flight search:', error);
       toast.error('Error during flight search');
     }
-
+      
     const formattedDate = selectedDate.toISOString().split('T')[0];
     console.log(SuryaairlineUrl);
     console.log(airlinesapi);
@@ -318,10 +323,17 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
   };
 
   return (
+   <div className='m-2'> 
+    <ImageSlider />
+    <div className="container mt-4 p-3 bg-white" style={{ width: '70vw', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'}}>  
+      
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', }}>
+        <div className="bg-info text-center"style={{  borderRadius: '5px' }} >
+          <h2 className="m-1">Find Your Destination</h2>
     
-    <div className="container mt-4">
-      <ImageSlider />
-      <h2 className="mb-4">Find Your Destination</h2>
+        </div>
+      </div>
+
       <div className="row">
         <div className="col-md-3">
           <div className="form-group">
@@ -373,18 +385,34 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
           </div>
         </div>
         <div className="col-md-3">
+          <div className="form-group">
+           <label htmlFor="bookingType">Booking Type:</label>
+           <select
+              id="bookingType"
+              className="form-control"
+              value={bookingType}
+              onChange={(e) => setBookingType(e.target.value)}
+            >
+             <option value="One Way">One Way</option>
+             <option value="Round Trip">Round Trip</option>
+           </select>
+          </div>
+        </div>
+
+        <div className="col-m3  m-2">
           <button onClick={handleSearch} className="btn btn-primary">
             Search Flights
           </button>
         </div>
       </div>
+    </div>  
       {availableFlights.length > 0 && (
-  <div className="container mt-4" style={{ width: '60vw' }}>
+  <div className="container mt-4 " style={{ width: '60vw' }}>
     <h2 className="mb-3">Available Flights</h2>
-    <div className="row">
+    <div className="row" >
       {availableFlights.map((flight) => (
         <div key={flight.scheduleId} className="col-md-12 mb-3">
-          <div className="card">
+          <div className="card"style={{ width: '60vw' ,boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'}}>
             <div className="card-body">
               <div className="text-center mb-3 text-success fs-5">
                 <FontAwesomeIcon icon={faPlane} className="mr-2" style={{ fontSize: '2em' }} />
@@ -427,14 +455,15 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
 )}
 
 {connectedFlights.length > 0 && (
-  <div className="container mt-3" style={{ width: '60vw' }}>
+  <div className="container mt-3" style={{ width: '60vw', }}>
     <h3 className="mb-2">Connecting Flights</h3>
     <div className="row">
       {connectedFlights.map((connectingFlights, index) => (
         <div key={index} className="col-md-12 mb-3">
-          <div className="card">
+          <div className="card" style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)' }}>
             <div className="card-body">
               {/* ... (existing code) */}
+              <div className='mt-2 p-2'style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)' }} >
               <div className="mt-2" style={{ color: 'black', fontWeight: 'bold' }}>
                   <p>First Flight</p>
                 </div>  
@@ -472,7 +501,8 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
                     <strong>Duration:</strong> {connectingFlights.firstLeg.flightDuration}
                   </p>
                 </div>
-
+                </div>
+                <div className='mt-3 p-2'style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)' }}>
                 {/* Text for the second flight */}
                 <div className="mt-2 mb-0" style={{ color: 'black', fontWeight: 'bold' }}>
                   <p>Second Flight</p>
@@ -510,7 +540,7 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
                     <strong>Duration:</strong> {connectingFlights.secondLeg.flightDuration}
                   </p>
                 </div>
-
+                </div>
                 {/* Book Now button for connected flights */}
                 <button onClick={() => handleBookNowConnecting(connectingFlights.firstLeg.scheduleId, connectingFlights.secondLeg.scheduleId)} className="btn btn-primary mt-3">
                   Book Now
@@ -523,14 +553,14 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
     </div>
   )}
 
-<div className="container mt-4 bg-white" style={{ width: '60vw', }}>
+<div className="container mt-4 " style={{ width: '70vw', }}>
   <div className="m-0">
     
     {finalIntegratedConnectingFlights.map((connection, index) => (
       <div key={index} className="flex justify-between">
         <h3>Integrated Connecting Flights</h3>
-        <div className="flex border p-3 bold  rounded hover:cursor-pointer m-5">
-          <div className="p-2">
+        <div className="flex border bg-white p-3 bold  rounded hover:cursor-pointer m-5"style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)' }}>
+          <div className="p-2" style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)' }}>
                 <div className="mt-0" style={{ color: 'blue', fontWeight: 'bold' }}>
                   <p>First Flight</p>
                 </div>
@@ -572,7 +602,7 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
             </div>
           </div>
 
-          <div className="p-3">
+          <div className="p-3 mt-3" style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)' }}>
                <div className="mt-2 mb-0" style={{ color: 'green', fontWeight: 'bold' }}>
                   <p>Second Flight</p>
                 </div>
