@@ -15,22 +15,38 @@ const ImageSlider = () => {
     nextArrow: <CustomNextArrow />,
   };
 
-  const imageUrls = [
-    'https://www.shutterstock.com/image-photo/white-passenger-plane-fly-over-600nw-1915850917.jpg',
-    'https://pilotinstitute.com/wp-content/uploads/2023/02/How-Much-Do-Airplanes-Cost.jpg',
-    'https://www.cleartrip.com/offers/sites/default/files/styles/destination-top/public/_op_2392_x_1196_axis-air.png?itok=C7KwAMs1',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSay2ESu0BaSBmJwx1oxuITJecusaZA5SGBXA&usqp=CAU',
+  const imageItems = [
+    {
+      imageUrl: 'https://www.shutterstock.com/image-photo/white-passenger-plane-fly-over-600nw-1915850917.jpg',
+      size: { width: '100%', height: '100%' },
+    },
+    {
+      imageUrl: 'https://pilotinstitute.com/wp-content/uploads/2023/02/How-Much-Do-Airplanes-Cost.jpg',
+      size: { width: '100%', height: '100%' },
+    },
+    {
+      imageUrl: 'https://www.cleartrip.com/offers/sites/default/files/styles/destination-top/public/_op_2392_x_1196_axis-air.png?itok=C7KwAMs1',
+      size: { width: '100%', height: '100%' },
+    },
+    {
+      imageUrl: 'https://www.yatra.com/ythomepagecms/media/imagemanager/2019/Dec/81f8c45e11fc69990887380531d8170b.jpg',
+      size: { width: '100%', height: '100%' },
+    },
+    {
+      imageUrl: 'https://offercdn.paytm.com/blog/2021/12/welcomeflight-tnc-app.png',
+      size: { width: '100%', height: '100%' },
+    },
   ];
 
   return (
     <div className="slider-container" style={{ height: '90vh', overflow: 'hidden' }}>
       <Slider {...settings}>
-        {imageUrls.map((imageUrl, index) => (
+        {imageItems.map((imageItem, index) => (
           <div key={index}>
             <img
-              src={imageUrl}
+              src={imageItem.imageUrl}
               alt={`Slide ${index + 1}`}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              style={imageItem.size}
             />
           </div>
         ))}

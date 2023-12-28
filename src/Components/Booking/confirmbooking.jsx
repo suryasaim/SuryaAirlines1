@@ -104,14 +104,18 @@ const ConfirmBooking = () => {
         ),
       };
 
-      // Use Axios to make the POST request
+      // Use Axios to make the POST request with JWT token
+      const token = localStorage.getItem('authToken');
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+
       const createBookingResponse = await axios.post(
         'http://192.168.10.71:98/api/Booking/CreateBooking',
         requestData,
         {
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers,
         }
       );
 

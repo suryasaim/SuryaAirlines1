@@ -11,7 +11,8 @@ const IntegratedConfirmBooking = () => {
   const [confirmationDataSecondSchedule, setConfirmationDataSecondSchedule] = useState([]);
   const [integratedConfirmationDataFirstSchedule, setIntegratedConfirmationDataFirstSchedule] = useState([]);
   const [integratedConfirmationDataSecondSchedule, setIntegratedConfirmationDataSecondSchedule] = useState([]);
-  
+  const [confirmationSeatsDataFirstSchedule, setConfirmationSeatsDataFirstSchedule] = useState([]);
+  const [confirmationSeatsDataSecondSchedule, setConfirmationSeatsDataSecondSchedule] = useState([]);
   useEffect(() => {
     try {
       const numberOfPassengers = sessionStorage.getItem('numberOfPassengers');
@@ -50,7 +51,28 @@ const IntegratedConfirmBooking = () => {
 
       setConfirmationDataFirstSchedule(usersDataFirstSchedule);
 
-     console.log(usersDataFirstSchedule)
+      
+
+     //console.log(usersDataFirstSchedule)
+
+     
+      /////////////////////////////////////////////////////////////////////////////
+      //first schedule seats
+     const selectedSeatsFirstSchedule = bookingData.users.map((user, index) => {
+      const selectedSeatsKey = 'selectedSeatsFirstSchedule';
+      const selectedSeats = selectedSeatsData[selectedSeatsKey][index];  // Fix the typo here
+      const scheduleId = integratedBookingInfo.scheduleIds[0];
+    
+      return {
+        scheduleId: scheduleId,
+        selectedSeats: [selectedSeats],
+      };
+    });
+    
+    // Save the selected seats and scheduleId for the first schedule
+    setConfirmationSeatsDataFirstSchedule(selectedSeatsFirstSchedule);
+    //console.log(selectedSeatsFirstSchedule);
+     
      // Second Schedule
      const usersDataSecondSchedule = bookingData.users.map((user, index) => {
         const selectedSeatsKey = 'selectedSeatsSecondSchedule';
@@ -70,7 +92,22 @@ const IntegratedConfirmBooking = () => {
       });
 
       setConfirmationDataSecondSchedule(usersDataSecondSchedule);
-      console.log(usersDataSecondSchedule)  
+      //console.log(usersDataSecondSchedule)  
+      //secondscheduleseats
+      const selectedSeatsSecondSchedule = bookingData.users.map((user, index) => {
+        const selectedSeatsKey = 'selectedSeatsSecondSchedule';
+        const selectedSeats = selectedSeatsData[selectedSeatsKey][index];
+        const scheduleId = integratedBookingInfo.scheduleIds[1]; // Use index 1 for the second schedule
+      
+        return {
+          scheduleId: scheduleId,
+          selectedSeats: [selectedSeats],
+        };
+      });
+      
+      // Save the selected seats and scheduleId for the second schedule
+      setConfirmationSeatsDataSecondSchedule(selectedSeatsSecondSchedule);
+      //console.log(selectedSeatsSecondSchedule);
      // First integratedS chedule
        const usersDataFirstintegratedSchedule = bookingData.users.map((user, index) => {
         const selectedSeatsKey = 'selectedSeatsFirstSchedule';
@@ -98,7 +135,7 @@ const IntegratedConfirmBooking = () => {
 
       
       setIntegratedConfirmationDataFirstSchedule(usersDataFirstintegratedSchedule);
-      console.log(usersDataFirstintegratedSchedule)
+      //console.log(usersDataFirstintegratedSchedule)
       
       // second integrated Schedule
       const usersDataSecondintegratedSchedule = bookingData.users.map((user, index) => {
@@ -125,7 +162,7 @@ const IntegratedConfirmBooking = () => {
       });
 
       setIntegratedConfirmationDataSecondSchedule(usersDataSecondintegratedSchedule);
-      console.log(usersDataSecondintegratedSchedule)
+      //console.log(usersDataSecondintegratedSchedule)
     } catch (error) {
       console.error('Error processing data from session storage:', error);
       toast.error('Error processing data from session storage');
@@ -237,7 +274,7 @@ const IntegratedConfirmBooking = () => {
     );
 
     sessionStorage.setItem('savedDataSecondIntegratedSchedule', JSON.stringify(savedDataSecondIntegratedSchedule));
-     console.log(savedDataSecondIntegratedSchedule)
+     //console.log(savedDataSecondIntegratedSchedule)
       toast.success('Data saved successfully for both schedules in the desired format!');
     } catch (error) {
       console.error('Error saving data to session storage:', error);
@@ -245,7 +282,70 @@ const IntegratedConfirmBooking = () => {
     }
   };
 
+//////////////////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////////////////////
   const handleConfirm = async () => {
+      const integratedBookingInfo = JSON.parse(sessionStorage.getItem('integratedBookingInfo'));
+      const token = localStorage.getItem('authToken');
+      const status = "Booked"
+    //console.log(confirmationSeatsDataFirstSchedule)
+    const firstFlightSeats = confirmationSeatsDataFirstSchedule.map((schedule)=>{
+      return schedule.selectedSeats
+    })
+    
+    //console.log(firstFlightSeats.flat())
+
+
+    //console.log(confirmationSeatsDataSecondSchedule)
+    const secondFlightSeats = confirmationSeatsDataSecondSchedule.map((schedule)=>{
+      return schedule.selectedSeats
+    })
+
+    //console.log(secondFlightSeats.flat());
+
+
+    try {
+      const sendDataResponse = await axios.patch(
+        `${integratedBookingInfo.apiPaths[0]}Integration/changeseatstatus/${confirmationSeatsDataFirstSchedule[0].scheduleId}/${status}`,
+        firstFlightSeats.flat(),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, // Include the JWT token in the headers
+          },
+        }
+      );
+
+     // console.log('Response from sending data to API:', sendDataResponse);
+      
+      // Handle the response as needed
+    } catch (error) {
+      console.error('Error sending data to API:', error);
+      throw error; // Rethrow the error to handle it later
+    }
+
+    try {
+      const sendDataResponse = await axios.patch(
+        `${integratedBookingInfo.apiPaths[1]}Integration/changeseatstatus/${confirmationSeatsDataSecondSchedule[0].scheduleId}/${status}`,
+        secondFlightSeats.flat(),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, // Include the JWT token in the headers
+          },
+        }
+      );
+
+     // console.log('Response from sending data to API:', sendDataResponse);
+      
+      // Handle the response as needed
+    } catch (error) {
+      console.error('Error sending data to API:', error);
+      throw error; // Rethrow the error to handle it later
+    }
     try {
       const integratedBookingInfoString = sessionStorage.getItem('integratedBookingInfo');
       if (!integratedBookingInfoString) {
@@ -255,8 +355,9 @@ const IntegratedConfirmBooking = () => {
       }
   
       const integratedBookingInfo = JSON.parse(integratedBookingInfoString);
+      const token = localStorage.getItem('authToken');
   
-      console.log(integratedBookingInfo);
+      //console.log(integratedBookingInfo);
       const requestDataFirstSchedule = {
         booking: {
           bookingId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
@@ -287,7 +388,7 @@ const IntegratedConfirmBooking = () => {
         ),
       };
   
-      console.log(requestDataFirstSchedule);
+      //console.log(requestDataFirstSchedule);
   
       let createBookingResponseFirstSchedule;
   
@@ -299,16 +400,18 @@ const IntegratedConfirmBooking = () => {
           {
             headers: {
               'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`, // Include the JWT token in the headers
             },
           }
         );
   
-        console.log('Response from Axios:', createBookingResponseFirstSchedule);
+        //console.log('Response from Axios:', createBookingResponseFirstSchedule);
       } catch (error) {
         console.error('Error in Axios request:', error);
         throw error; // Rethrow the error to handle it later
       }
-  
+
+      
       if (createBookingResponseFirstSchedule.status === 200) {
         // Store the response data in session storage
         const responseData = createBookingResponseFirstSchedule.data;
@@ -339,22 +442,22 @@ const IntegratedConfirmBooking = () => {
             dateTime:integratedBookingInfo.dateTimes[1],
           }));
   
-        console.log('Transformed Data:', transformedData);
-        console.log(transformedData)
+        //console.log('Transformed Data:', transformedData);
+        //console.log(transformedData)
         // Send the transformed data to the API
         try {
-          console.log(integratedBookingInfo.apiPaths[1])
           const sendDataResponse = await axios.post(
-            `${integratedBookingInfo.apiPaths[1]}Integration/partnerbooking`, // Replace with your actual API endpoint
+            `${integratedBookingInfo.apiPaths[1]}Integration/partnerbooking`,
             transformedData,
             {
               headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`, // Include the JWT token in the headers
               },
             }
           );
   
-          console.log('Response from sending data to API:', sendDataResponse);
+         // console.log('Response from sending data to API:', sendDataResponse);
           
           // Handle the response as needed
         } catch (error) {
@@ -378,8 +481,8 @@ const IntegratedConfirmBooking = () => {
       sessionStorage.removeItem('integratedBookingInfo');
       sessionStorage.removeItem('numberOfPassengers');
   
-      navigate('/dashboard');
-      toast.success('Tickets Booked Successfully for both schedules');
+      navigate('/dashboard/Tickets/tickets');
+      toast.success('Tickets Booked Successfully for both Flights');
     } catch (error) {
       console.error('Error confirming booking:', error);
       toast.error('Error confirming booking');
@@ -403,7 +506,7 @@ const IntegratedConfirmBooking = () => {
 
   return (
     <Layout>
-      <div className="container mt-4">
+      <div className="container mt-4" style={{ width: '60vw' }}>
         <h2>Confirmation Page</h2>
 
         {/* Display user details for the first schedule in a table */}

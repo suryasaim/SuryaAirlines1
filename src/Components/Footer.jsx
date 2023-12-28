@@ -4,7 +4,7 @@ import React from 'react';
 
 const YourFooterComponent = () => {
   return (
-    <footer className="bg-info fixed-bottom p-1">
+    <footer className="bg-info fixed-bottom p-1 "style={{ height: '7vh' }}>
       <div className="container">
         <div className="d-flex justify-content-between align-items-center">
           <div>

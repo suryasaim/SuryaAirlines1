@@ -152,96 +152,101 @@ const ConnectConfirmBooking = () => {
 
  
 
-const handleConfirm = async () => {
-  try {
-    // Confirm logic for the first schedule
-    const requestDataFirstSchedule = {
-      booking: {
-        bookingId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-        status: 'Booked',
-        id: confirmationDataFirstSchedule[0]?.userId,
-        bookingType: confirmationDataFirstSchedule[0]?.bookingType,
-      },
-      flightTickets: confirmationDataFirstSchedule.flatMap((user) =>
-        user.selectedSeats.map((seat) => ({
-          scheduleId: user.scheduleId,
-          name: user.name,
-          age: user.age,
-          gender: user.gender,
-          seatNo: seat,
-        }))
-      ),
-    };
-
-    // Use Axios to make the POST request for the first schedule
-    const createBookingResponseFirstSchedule = await axios.post(
-      'http://192.168.10.71:98/api/Booking/CreateBooking',
-      requestDataFirstSchedule,
-      {
-        headers: {
-          'Content-Type': 'application/json',
+  const handleConfirm = async () => {
+    try {
+      // Confirm logic for the first schedule
+      const requestDataFirstSchedule = {
+        booking: {
+          bookingId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+          status: 'Booked',
+          id: confirmationDataFirstSchedule[0]?.userId,
+          bookingType: confirmationDataFirstSchedule[0]?.bookingType,
         },
+        flightTickets: confirmationDataFirstSchedule.flatMap((user) =>
+          user.selectedSeats.map((seat) => ({
+            scheduleId: user.scheduleId,
+            name: user.name,
+            age: user.age,
+            gender: user.gender,
+            seatNo: seat,
+          }))
+        ),
+      };
+
+      // Retrieve JWT token from localStorage
+      const token = localStorage.getItem('authToken');
+
+      // Use Axios to make the POST request for the first schedule
+      const createBookingResponseFirstSchedule = await axios.post(
+        'http://192.168.10.71:98/api/Booking/CreateBooking',
+        requestDataFirstSchedule,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`, // Include the JWT token in the headers
+          },
+        }
+      );
+
+      if (!createBookingResponseFirstSchedule.data || createBookingResponseFirstSchedule.data.error) {
+        throw new Error('Failed to create booking for the first schedule');
       }
-    );
 
-    if (!createBookingResponseFirstSchedule.data || createBookingResponseFirstSchedule.data.error) {
-      throw new Error('Failed to create booking for the first schedule');
-    }
+      // Clear session storage for the first schedule after successful booking
+      sessionStorage.removeItem('savedDataFirstSchedule');
 
-    // Clear session storage for the first schedule after successful booking
-    sessionStorage.removeItem('savedDataFirstSchedule');
-
-    // Confirm logic for the second schedule
-    const requestDataSecondSchedule = {
-      booking: {
-        bookingId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-        status: 'Booked',
-        id: confirmationDataSecondSchedule[0]?.userId,
-        bookingType: confirmationDataSecondSchedule[0]?.bookingType,
-      },
-      flightTickets: confirmationDataSecondSchedule.flatMap((user) =>
-        user.selectedSeats.map((seat) => ({
-          scheduleId: user.scheduleId,
-          name: user.name,
-          age: user.age,
-          gender: user.gender,
-          seatNo: seat,
-        }))
-      ),
-    };
-
-    // Use Axios to make the POST request for the second schedule
-    const createBookingResponseSecondSchedule = await axios.post(
-      'http://192.168.10.71:98/api/Booking/CreateBooking',
-      requestDataSecondSchedule,
-      {
-        headers: {
-          'Content-Type': 'application/json',
+      // Confirm logic for the second schedule
+      const requestDataSecondSchedule = {
+        booking: {
+          bookingId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+          status: 'Booked',
+          id: confirmationDataSecondSchedule[0]?.userId,
+          bookingType: confirmationDataSecondSchedule[0]?.bookingType,
         },
+        flightTickets: confirmationDataSecondSchedule.flatMap((user) =>
+          user.selectedSeats.map((seat) => ({
+            scheduleId: user.scheduleId,
+            name: user.name,
+            age: user.age,
+            gender: user.gender,
+            seatNo: seat,
+          }))
+        ),
+      };
+
+      // Use Axios to make the POST request for the second schedule
+      const createBookingResponseSecondSchedule = await axios.post(
+        'http://192.168.10.71:98/api/Booking/CreateBooking',
+        requestDataSecondSchedule,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`, // Include the JWT token in the headers
+          },
+        }
+      );
+
+      if (!createBookingResponseSecondSchedule.data || createBookingResponseSecondSchedule.data.error) {
+        throw new Error('Failed to create booking for the second schedule');
       }
-    );
 
-    if (!createBookingResponseSecondSchedule.data || createBookingResponseSecondSchedule.data.error) {
-      throw new Error('Failed to create booking for the second schedule');
+      // Clear session storage for the second schedule after successful booking
+      sessionStorage.removeItem('savedDataSecondSchedule');
+
+      // Clear other session storage items
+      sessionStorage.removeItem('bookingData');
+      sessionStorage.removeItem('selectedSeatsData');
+      sessionStorage.removeItem('bookingInfo');
+      sessionStorage.removeItem('numberOfPassengers');
+
+      // Redirect to a success page or handle accordingly
+      navigate('/dashboard/Tickets/tickets');
+      toast.success('Tickets Booked Successfully for both Flights');
+    } catch (error) {
+      console.error('Error confirming booking:', error);
+      toast.error('Error confirming booking');
     }
-
-    // Clear session storage for the second schedule after successful booking
-    sessionStorage.removeItem('savedDataSecondSchedule');
-
-    // Clear other session storage items
-    sessionStorage.removeItem('bookingData');
-    sessionStorage.removeItem('selectedSeatsData');
-    sessionStorage.removeItem('bookingInfo');
-    sessionStorage.removeItem('numberOfPassengers');
-
-    // Redirect to a success page or handle accordingly
-    navigate('/dashboard/Tickets/tickets');
-    toast.success('Tickets Booked Successfully for both schedules');
-  } catch (error) {
-    console.error('Error confirming booking:', error);
-    toast.error('Error confirming booking');
-  }
-};
+  };
 
 
   const handleBack = () => {

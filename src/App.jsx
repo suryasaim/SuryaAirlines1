@@ -32,6 +32,7 @@ import ConnectBookingDetails from './Components/ConnectBooking/Connectbookingdet
 import ConnectSeatBooking from './Components/ConnectBooking/connectseatbooking';
 import ConnectConfirmBooking from './Components/ConnectBooking/connectconfirbooking';
 import Tickets from './Components/Tickets/tickets';
+import ConnectingTickets from './Components/Tickets/connectiontickets';
 import IntegratedSeatBooking from './Components/IntegratedBooking/integtratedseatbooking';
 import IntegratedBookingDetails from './Components/IntegratedBooking/integratedbookingdetails';
 import IntegratedConfirmBooking from './Components/IntegratedBooking/integratedconfirmbooking';
@@ -47,6 +48,7 @@ function App() {
         <Route path='/layout' element={<Layout />} />
         <Route path='/dashboard' element={<Dashboard />} />
         <Route path='/dashboard/Tickets/tickets' element={<Tickets/>} />
+        <Route path='/dashboard/Tickets/connectiontickets' element={<ConnectingTickets/>} />
        
         <Route path='/admin/Airports/Airport' element={<Airports />} />
         <Route path='/admin/Airports/addairport' element={<AddAirport />} />

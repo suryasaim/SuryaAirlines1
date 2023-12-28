@@ -9,36 +9,59 @@ function Airports() {
   const [airports, setAirports] = useState([]);
 
   useEffect(() => {
-    async function fetchAirports() {
+    const fetchAirports = async () => {
       try {
-        const response = await axios.get('http://192.168.10.71:98/api/Airport');
+        const token = localStorage.getItem('authToken');
+        const headers = { Authorization: `Bearer ${token}` };
+
+        const response = await axios.get('http://192.168.10.71:98/api/Airport', { headers });
+
         setAirports(response.data);
       } catch (error) {
-        console.error('Error fetching airports:', error);
+        handleRequestError(error, 'Error fetching airports');
       }
-    }
+    };
 
     fetchAirports();
   }, []);
 
   const handleDelete = async (airportId) => {
     try {
-      await axios.delete(`http://192.168.10.71:98/api/Airport/${airportId}`);
-      // After successful deletion, you can update the airport list or show a success message.
-      // For example, you can fetch the updated list of airports.
+      const token = localStorage.getItem('authToken');
+      const headers = { Authorization: `Bearer ${token}` };
+
+      await axios.delete(`http://192.168.10.71:98/api/Airport/${airportId}`, { headers });
+
       const updatedAirports = airports.filter((airport) => airport.airportId !== airportId);
       setAirports(updatedAirports);
+
       toast.success('Airport deleted successfully');
     } catch (error) {
-      console.error('Error deleting airport:', error);
-      toast.error('Error deleting airport');
+      handleRequestError(error, 'Error deleting airport');
+    }
+  };
+
+  const handleRequestError = (error, defaultMessage) => {
+    console.error('Request failed:', error);
+
+    if (error.response) {
+      const { status } = error.response;
+
+      if (status === 401) {
+        // Unauthorized, handle accordingly (e.g., redirect to login)
+        toast.error('Unauthorized: Please log in.');
+      } else {
+        toast.error(`Request failed with status ${status}`);
+      }
+    } else {
+      toast.error(defaultMessage);
     }
   };
 
   return (
     <AdminLayout>
       <div>
-        <h1>Airports</h1>
+        <h2>Airports</h2>
         <Link to="/admin/airports/addairport" className="btn btn-success mb-3">
           Add Airport
         </Link>

@@ -4,7 +4,7 @@ import Layout from '../layout';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const TicketDetails = () => {
+const Tickets = () => {
   const [ticketDetails, setTicketDetails] = useState([]);
 
   useEffect(() => {
@@ -17,15 +17,27 @@ const TicketDetails = () => {
           console.error('User id not found in local storage');
           return;
         }
-  
-        // Fetch ticket details using the FlightTicket API
-        const response = await axios.get(`http://192.168.10.71:98/api/FlightTicket/flighttickets/${userId}`);
+
+        // Get the token from local storage
+        const token = localStorage.getItem('authToken');
+
+        // Fetch ticket details using the FlightTicket API with authentication
+        const response = await axios.get(`http://192.168.10.71:98/api/FlightTicket/flighttickets/${userId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
         const tickets = response.data;
   
         // Fetch schedule details for each ticket
         const ticketDetailsWithSchedule = await Promise.all(
           tickets.map(async (ticket) => {
-            const scheduleResponse = await axios.get(`http://192.168.10.71:98/api/Schedule/GetSchedules/${ticket.scheduleId}`);
+            const scheduleResponse = await axios.get(`http://192.168.10.71:98/api/Schedule/GetSchedules/${ticket.scheduleId}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+              },
+            });
             const schedule = scheduleResponse.data;
   
             return { ...ticket, schedule };
@@ -66,16 +78,26 @@ const TicketDetails = () => {
     try {
       const currentDateTime = new Date();
       const ticketArrivalDateTime = new Date(arrivalTime);
-
+  
       // Check if the ticket can be canceled (arrival time is after 24 hours)
       if (ticketArrivalDateTime > currentDateTime.getTime() + 24 * 60 * 60 * 1000) {
         // Implement cancellation logic here
-        const response = await axios.patch(`http://192.168.10.71:98/api/FlightTicket/DeleteTicket/${ticketNo}`);
+        const token = localStorage.getItem('authToken');
+        const response = await axios.patch(
+          `http://192.168.10.71:98/api/FlightTicket/DeleteTicket/${ticketNo}`,
+          null,  // You can send data if needed
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',  // Set content type to application/json
+            },
+          }
+        );
         console.log(response.data); // Log the cancellation response
-
+  
         // Reload ticket details after cancellation (you may want to fetch fresh data)
         // fetchTicketDetails();
-
+  
         // Show success message
         toast.success('Ticket canceled successfully!', { autoClose: 3000 });
       } else {
@@ -86,22 +108,32 @@ const TicketDetails = () => {
       console.error('Error canceling ticket:', error);
     }
   };
-
+  
   // Helper function to handle booking cancellation
   const cancelBooking = async (bookingId, departureTime) => {
     try {
       const currentDateTime = new Date();
       const departureDateTime = new Date(departureTime);
-
+  
       // Check if the booking can be canceled (departure time is after 24 hours)
       if (departureDateTime > currentDateTime.getTime() + 24 * 60 * 60 * 1000) {
         // Implement booking cancellation logic here
-        const response = await axios.patch(`http://192.168.10.71:98/api/Booking/DeleteBooking/${bookingId}`);
+        const token = localStorage.getItem('authToken');
+        const response = await axios.patch(
+          `http://192.168.10.71:98/api/Booking/DeleteBooking/${bookingId}`,
+          null,  // You can send data if needed
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',  // Set content type to application/json
+            },
+          }
+        );
         console.log(response.data); // Log the cancellation response
-
+  
         // Reload ticket details after cancellation (you may want to fetch fresh data)
         // fetchTicketDetails();
-
+  
         // Show success message
         toast.success('Booking canceled successfully!', { autoClose: 3000 });
       } else {
@@ -186,4 +218,4 @@ const sortedBookingIds = Object.keys(groupedTickets).sort(
   );
 };
 
-export default TicketDetails;
+export default Tickets;

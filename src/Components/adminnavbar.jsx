@@ -14,11 +14,15 @@ function AdminNavBar() {
     localStorage.removeItem('flightSearchResults');
     localStorage.removeItem('authToken');
     localStorage.removeItem('flightSearchParameters');
+    localStorage.removeItem('roles');
+    localStorage.removeItem('id');
+    localStorage.removeItem('token');
+
 
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light fixed-top"style={{ backgroundColor: '#87CEEB' }}>
+    <nav className="navbar navbar-expand-lg navbar-light fixed-top bg-info" >
       <div className="container">
         <Link to="/admindashboard" className="navbar-brand">
           SURYA AIRLINES Admin Dashboard

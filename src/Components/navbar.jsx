@@ -12,6 +12,9 @@ function NavBar() {
     localStorage.removeItem('flightSearchResults');
     localStorage.removeItem('authToken');
     localStorage.removeItem('flightSearchParameters');
+    localStorage.removeItem('roles');
+    localStorage.removeItem('id');
+    localStorage.removeItem('token');
 
   };
 
@@ -47,6 +50,11 @@ function NavBar() {
             <li className="nav-item">
               <Link to="/dashboard/Tickets/tickets" className="nav-link">
                 Bookings
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/dashboard/Tickets/connectiontickets" className="nav-link">
+                Partner Flight Bookings
               </Link>
             </li>
             <li className="nav-item">

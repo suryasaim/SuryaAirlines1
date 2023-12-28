@@ -18,10 +18,13 @@ function EditAirport() {
   useEffect(() => {
     async function fetchAirport() {
       try {
-        const response = await axios.get(`http://localhost:98/api/Airport/${id}`);
+        const token = localStorage.getItem('authToken');
+        const headers = { Authorization: `Bearer ${token}` };
+
+        const response = await axios.get(`http://192.168.10.71:98/api/Airport/${id}`, { headers });
         setAirport(response.data);
       } catch (error) {
-        console.error('Error fetching airport:', error);
+        handleRequestError(error, 'Error fetching airport');
       }
     }
 
@@ -38,21 +41,33 @@ function EditAirport() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
-      await axios.patch(`http://192.168.10.71:98/api/Airport/${id}`, airport);
+      const token = localStorage.getItem('authToken');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json', // Set the Content-Type header
+      };
+  
+      await axios.patch(`http://192.168.10.71:98/api/Airport/${id}`, airport, { headers });
       toast.success('Airport updated successfully');
-      //navigate('/admin/Airports/Airport'); // Redirect to Airports page
+      // Redirect to the Airports page or perform any other necessary actions
     } catch (error) {
       console.error('Error updating airport:', error);
-      toast.error('Error updating airport');
+  
+      if (error.response && error.response.status === 401) {
+        // Unauthorized, handle accordingly (e.g., redirect to login)
+        toast.error('Unauthorized: Please log in.');
+      } else {
+        toast.error('Error updating airport');
+      }
     }
   };
 
   return (
     <AdminLayout>
-      <div>
-        <h1>Edit Airport</h1>
+      <div className="container mt-5" style={{ width: '30vw', height: '100vh' }}>
+        <h2>Edit Airport</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="airportId" className="form-label">

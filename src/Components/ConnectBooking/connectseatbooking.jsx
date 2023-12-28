@@ -5,6 +5,7 @@ import { Button, Container, Row, Col } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCouch } from '@fortawesome/free-solid-svg-icons';
 import Layout from '../layout';
+import axios from 'axios';
 
 const ConnectSeatBooking = () => {
   const { scheduleIds } = useParams();
@@ -43,21 +44,30 @@ const ConnectSeatBooking = () => {
         const storedNumberOfPassengers = sessionStorage.getItem('numberOfPassengers');
         setNumberOfPassengers(parseInt(storedNumberOfPassengers, 10) || 1);
 
-        const firstResponse = await fetch(`http://192.168.10.71:98/api/Seats/BySchedule/${bookingInfo.scheduleIds[0]}`);
-        if (!firstResponse.ok) {
-          throw new Error('Failed to fetch seats for the first schedule');
-        }
-        const firstData = await firstResponse.json();
+        // Retrieve JWT token from local storage
+        const token = localStorage.getItem('authToken');
 
-        const secondResponse = await fetch(`http://192.168.10.71:98/api/Seats/BySchedule/${bookingInfo.scheduleIds[1]}`);
-        if (!secondResponse.ok) {
-          throw new Error('Failed to fetch seats for the second schedule');
+        // Make API requests with JWT authentication
+        const [firstResponse, secondResponse] = await Promise.all([
+          axios.get(`http://192.168.10.71:98/api/Seats/BySchedule/${bookingInfo.scheduleIds[0]}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+          axios.get(`http://192.168.10.71:98/api/Seats/BySchedule/${bookingInfo.scheduleIds[1]}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+        ]);
+
+        if (!firstResponse.data || !secondResponse.data) {
+          throw new Error('Failed to fetch seats for one or both schedules');
         }
-        const secondData = await secondResponse.json();
 
         setAvailableSeats({
-          firstFlightSeats: firstData,
-          secondFlightSeats: secondData,
+          firstFlightSeats: firstResponse.data,
+          secondFlightSeats: secondResponse.data,
         });
       } catch (error) {
         console.error(error);
@@ -150,7 +160,7 @@ const ConnectSeatBooking = () => {
 
   return (
     <Layout>
-      <Container style={{ width: '60vw', height: '100vh',background: 'rgba(255, 255, 255, 0.8)', padding: '10px' }}>
+      <Container style={{ width: '60vw',background: 'rgba(255, 255, 255, 0.8)', }}>
         <h2 className="mt-4 mb-4">Connecting Seat Selection</h2>
         <h3 className="mt-4 mb-4">First Flight Seat Selection</h3>
         <Row xs={2} md={3} lg={6} className="mb-4">

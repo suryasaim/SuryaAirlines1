@@ -379,7 +379,7 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
         </div>
       </div>
       {availableFlights.length > 0 && (
-  <div className="mt-4">
+  <div className="container mt-4" style={{ width: '60vw' }}>
     <h2 className="mb-3">Available Flights</h2>
     <div className="row">
       {availableFlights.map((flight) => (
@@ -427,24 +427,25 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
 )}
 
 {connectedFlights.length > 0 && (
-  <div className="mt-4" >
-    <h2 className="mb-3">Connecting Flights</h2>
+  <div className="container mt-3" style={{ width: '60vw' }}>
+    <h3 className="mb-2">Connecting Flights</h3>
     <div className="row">
       {connectedFlights.map((connectingFlights, index) => (
         <div key={index} className="col-md-12 mb-3">
           <div className="card">
             <div className="card-body">
               {/* ... (existing code) */}
-              <div className="text-center mb-3">
-                  <FontAwesomeIcon icon={faPlane} className="mr-2" style={{ fontSize: '2em' }} />
+              <div className="mt-2" style={{ color: 'black', fontWeight: 'bold' }}>
+                  <p>First Flight</p>
+                </div>  
+              <div className="text-center mb-3 text-primary fs-5">
+                  <FontAwesomeIcon icon={faPlane} className="mr-4 pr-5" style={{ fontSize: '2em' }} />
                   <span className="airline-name">{connectingFlights.firstLeg.flightName}</span>
               </div>
-                <div className="mt-2" style={{ color: 'blue', fontWeight: 'bold' }}>
-                  <p>First Flight</p>
-                </div>
+                
 
               {/* Swap the positions of arrival time and departure time for the second leg */}
-              <div className="d-flex align-items-center justify-content-between mb-3">
+              <div className="d-flex align-items-center justify-content-between mb-2">
                 <div className="text-center">
                   <p className="card-text">
                     <strong>From:</strong> {connectingFlights.firstLeg.sourceCity} ({connectingFlights.firstLeg.sourceAirportName})
@@ -473,11 +474,11 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
                 </div>
 
                 {/* Text for the second flight */}
-                <div className="mt-2 mb-0" style={{ color: 'blue', fontWeight: 'bold' }}>
+                <div className="mt-2 mb-0" style={{ color: 'black', fontWeight: 'bold' }}>
                   <p>Second Flight</p>
                 </div>
                 {/* Details for the second leg */}
-                <div className="text-center mb-3">
+                <div className="text-center mb-3 text-primary fs-5">
                   <FontAwesomeIcon icon={faPlane} className="mr-2" style={{ fontSize: '2em' }} />
                   <span className="airline-name">{connectingFlights.secondLeg.flightName}</span>
                 </div>
@@ -522,91 +523,122 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
     </div>
   )}
 
-<div className="container mt-4 bg-white">
-  <div className="m-5">
+<div className="container mt-4 bg-white" style={{ width: '60vw', }}>
+  <div className="m-0">
+    
     {finalIntegratedConnectingFlights.map((connection, index) => (
       <div key={index} className="flex justify-between">
-        {connection.SecondFlight.map((flight, i) => (
-          <div key={i} className="flex border p-2 hover:cursor-pointer m-5">
-            <div className="p-5">
-              <h3 className="text-center">{flight.airlineName}</h3>
-              <ul>
-                <li>{flight.flightName}</li>
-                <li>
-                  {flight.sourceAirportName} to {flight.destinationAirportName}
-                </li>
-                <li>Flight Duration: {flight.flightDuration}</li>
-                <li>
-                  Departure Date: {flight.dateTime?.split("T")[0]}, Departure Time:{" "}
-                  {flight.dateTime?.split("T")[1]}
-                </li>
-                <li>
-                  Arrival Date:{" "}
-                  {calculateArrivalDate(flight.dateTime, flight.flightDuration)}, Arrival
-                  Time: {calculateArrivalTime(flight.dateTime, flight.flightDuration)}
-                </li>
-              </ul>
+        <h3>Integrated Connecting Flights</h3>
+        <div className="flex border p-3 bold  rounded hover:cursor-pointer m-5">
+          <div className="p-2">
+                <div className="mt-0" style={{ color: 'blue', fontWeight: 'bold' }}>
+                  <p>First Flight</p>
+                </div>
+            <div>
+              <div className="text-center mb-3 text-primary fs-5">
+              <FontAwesomeIcon icon={faPlane} className="mr-2" style={{ fontSize: '2em' }} />
+                {connection.FirstFlight.flightName}
+               </div>
+
+               <div className="row mt-3">
+                 <div className="col-md-6">
+                   <strong>From:</strong> {connection.FirstFlight.sourceAirportName}
+                 </div>
+                 <div className="col-md-6 text-md-end">
+                   <strong>To:</strong> {connection.FirstFlight.destinationAirportName}
+                 </div>
+               </div>
+
+              
+              <div className="row m-2">
+                <div className="col-md-6 text-left">
+                  <div className="m-1  ">
+                   <strong>Arrival Date:</strong> {connection.FirstFlight.dateTime?.split('T')[0]},
+                  </div>
+                  <div>
+                   <strong>Arrival Time:</strong> {connection.FirstFlight.dateTime?.split('T')[1]}
+                  </div>
+                </div>
+                <div className="col-md-6 custom-right-align">
+                  <div className="m-1 ">
+                   <strong>Departure Date:</strong> {calculateArrivalDate(connection.FirstFlight.dateTime, connection.FirstFlight.flightDuration)},
+                   </div>
+                  <div>
+                    <strong>Departure Time:</strong> {calculateArrivalTime(connection.FirstFlight.dateTime, connection.FirstFlight.flightDuration)}
+                  </div>
+                </div>
+              </div>
+              <div><strong>Flight Duration:</strong>  {connection.FirstFlight.flightDuration}</div>
             </div>
           </div>
-        ))}
-        <div className="flex border p-2 hover:cursor-pointer m-5">
-          <div className="p-5">
-            <h3 className="text-center">{connection.FirstFlight.airlineName}</h3>
-            <ul>
-              <li>{connection.FirstFlight.flightName}</li>
-              <li>
-                {connection.FirstFlight.sourceAirportName} to{" "}
-                {connection.FirstFlight.destinationAirportName}
-              </li>
-              <li>Flight Duration: {connection.FirstFlight.flightDuration}</li>
-              <li>
-                Departure Date: {connection.FirstFlight.dateTime?.split("T")[0]}, Departure
-                Time: {connection.FirstFlight.dateTime?.split("T")[1]}
-              </li>
-              <li>
-                Arrival Date:{" "}
-                {calculateArrivalDate(
-                  connection.FirstFlight.dateTime,
-                  connection.FirstFlight.flightDuration
-                )}, Arrival Time:{" "}
-                {calculateArrivalTime(
-                  connection.FirstFlight.dateTime,
-                  connection.FirstFlight.flightDuration
-                )}
-              </li>
-            </ul>
 
-            {/* Common "Book Now" button */}
-            <button
-              onClick={() =>
-               handleBookNowIntegratedConnecting(
-                connection.FirstFlight.scheduleId,
-                connection.SecondFlight[0].scheduleId,
-                connection.FirstFlight.apiPath,
-                connection.SecondFlight[0].apiPath,
-                connection.FirstFlight.airlineName,
-                connection.SecondFlight[0].airlineName,
-                connection.FirstFlight.sourceAirportId,
-                connection.SecondFlight[0].sourceAirportId,
-                connection.FirstFlight.destinationAirportId,
-                connection.SecondFlight[0].destinationAirportId,
-                connection.FirstFlight.flightName,
-                connection.SecondFlight[0].flightName,
-                connection.FirstFlight.dateTime,
-                connection.SecondFlight[0].dateTime
-                
-          
-               )
-             }
-           >
-             Book Now
-           </button>
+          <div className="p-3">
+               <div className="mt-2 mb-0" style={{ color: 'green', fontWeight: 'bold' }}>
+                  <p>Second Flight</p>
+                </div>
+            <div>
+               <div className="text-center mb-3 text-success fs-5">
+                <FontAwesomeIcon icon={faPlane} className="mr-2" style={{ fontSize: '2em' }} />
+                 {connection.SecondFlight[0].flightName}
+               </div>
+              <div>
+                <strong>From:</strong> {connection.SecondFlight[0].sourceAirportName} <strong>To:</strong>{' '}
+                {connection.SecondFlight[0].destinationAirportName}
+              </div>
+              
+              <div className="row mt-2 mb-3">
+                <div className="col-md-6 ">
+                  <div className="m-1  ">
+                    <strong>Arrival Date:</strong> {connection.SecondFlight[0].dateTime?.split('T')[0]},
+                  </div>
+                  <div>
+                    <strong>Arrival Time:</strong> {connection.SecondFlight[0].dateTime?.split('T')[1]}
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="m-1  ">
+                    <strong>Departure Date:</strong> {calculateArrivalDate(connection.SecondFlight[0].dateTime, connection.SecondFlight[0].flightDuration)},
+                  </div>
+                  <div>
+                    <strong>Departure Time:</strong> {calculateArrivalTime(connection.SecondFlight[0].dateTime, connection.SecondFlight[0].flightDuration)}
+                  </div>
+                </div>
+              </div>
+
+              <div> <strong>Flight Duration:</strong> {connection.SecondFlight[0].flightDuration}</div>
+            </div>
           </div>
+          {/* Common "Book Now" button */}
+        <button
+          onClick={() =>
+            handleBookNowIntegratedConnecting(
+              connection.FirstFlight.scheduleId,
+              connection.SecondFlight[0].scheduleId,
+              connection.FirstFlight.apiPath,
+              connection.SecondFlight[0].apiPath,
+              connection.FirstFlight.airlineName,
+              connection.SecondFlight[0].airlineName,
+              connection.FirstFlight.sourceAirportId,
+              connection.SecondFlight[0].sourceAirportId,
+              connection.FirstFlight.destinationAirportId,
+              connection.SecondFlight[0].destinationAirportId,
+              connection.FirstFlight.flightName,
+              connection.SecondFlight[0].flightName,
+              connection.FirstFlight.dateTime,
+              connection.SecondFlight[0].dateTime
+            )
+          }
+          className="btn btn-primary mt-3"
+        >
+          Book Now
+        </button>
         </div>
+        
       </div>
     ))}
   </div>
 </div>
+
 
 
 </div>

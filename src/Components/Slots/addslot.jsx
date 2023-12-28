@@ -1,616 +1,202 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlane } from '@fortawesome/free-solid-svg-icons';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { airlinesapi , SuryaairlineUrl} from '../../Constant';
+import { useNavigate, useParams } from 'react-router-dom';
+import Layout from '../layout';
 
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
-import ImageSlider from './imageslider';
-
-
-
-function FindFlights() {
-  const [cityNames, setCityNames] = useState([]);
-  const [sourceAirportId, setSourceAirportId] = useState('');
-  const [destinationAirportId, setDestinationAirportId] = useState('');
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [availableFlights, setAvailableFlights] = useState([]);
-  const [connectedFlights, setConnectedFlights] = useState([]);
-  const [bookingInfo, setBookingInfo] = useState(null);
-
-
+const BookingDetails = () => {
+  const [users, setUsers] = useState([{ name: '', age: '', gender: '' }]);
+  const [bookingType, setBookingType] = useState('');
   const navigate = useNavigate();
-  const [finalIntegratedConnectingFlights,setFinalIntegratedConnectingFlights] =useState([])
+  const { scheduleId } = useParams();
 
   useEffect(() => {
-    async function fetchCityNames() {
-      try {
-        const response = await axios.get('http://192.168.10.71:98/api/Airport');
-        const airports = response.data;
-        setCityNames(airports);
-      } catch (error) {
-        console.error('Error fetching airport data:', error);
-      }
+    // Retrieve bookingInfo from sessionStorage
+    const bookingInfoString = sessionStorage.getItem('bookingInfo');
+  
+    if (!bookingInfoString) {
+      toast.error('Invalid bookingInfo. Please try again.');
+      // Redirect to the find flights page or handle accordingly
+      navigate('/dashboard');
+      return;
     }
-
-    fetchCityNames();
-  }, []);
-
-  const handleSearch = async () => {
+  
     try {
-
-      if (!sourceAirportId || !destinationAirportId) {
-        toast.error('Invalid source or destination airport. Please try again.');
-        return;
-      }
-      
-      const formattedDate = selectedDate.toISOString().split('T')[0];
-      localStorage.setItem('flightSearchParameters', JSON.stringify({
-        sourceAirportId,
-        destinationAirportId,
-        selectedDate: formattedDate,
-      }));
-      console.log(sourceAirportId);
-      console.log(destinationAirportId);
-      console.log(formattedDate);
+      // Parse the bookingInfo JSON string
+      const bookingInfo = JSON.parse(bookingInfoString);
   
-      let directFlightResponse = [];
-      let connectingFlightResponse = [];
-  
-      // Search for direct flights
-      try {
-        const directResponse = await axios.get(`http://192.168.10.71:98/api/Integration/directflight/${sourceAirportId}/${destinationAirportId}/${formattedDate}`);
-        directFlightResponse = directResponse.data;
-        console.log(directFlightResponse);
-      } catch (directError) {
-        console.info('Error fetching direct flights:', directError);
-        toast.info('No Direct flights Available');
-      }
-  
-      // Search for connecting flights
-      try {
-        const connectingResponse = await axios.get(`http://192.168.10.71:98/api/Integration/connectingflight/${sourceAirportId}/${destinationAirportId}/${formattedDate}`);
-        connectingFlightResponse = connectingResponse.data;
-        console.log(connectingFlightResponse);
-      } catch (connectingError) {
-        console.info('Error fetching connecting flights:', connectingError);
-        toast.info('No connecting flights Available');
-      }
-  
-      // Set the results for direct flights
-      if (directFlightResponse.length > 0) {
-        setAvailableFlights(directFlightResponse);
-        localStorage.setItem('flightSearchResults', JSON.stringify(directFlightResponse));
-      } else {
-        toast.info('No direct flights found for the selected route and date.');
-        setAvailableFlights([]);
-      }
-  
-      // Set the results for connecting flights
-      if (connectingFlightResponse.length > 0) {
-        const integratedConnectingFlights = [];
-      
-        for (const connectingFlight of connectingFlightResponse) {
-          // Search for the second leg of the connecting flight
-          const firstFlightDestinationId = connectingFlight.destinationAirportId;  // Use destinationAirportId instead of sourceAirportId
-          const firstFlightDate = formattedDate;
-      
-          try {
-            
-            const secondFlightResponse = await axios.get(
-              `http://192.168.10.71:98/api/Integration/directflight/${firstFlightDestinationId}/${destinationAirportId}/${firstFlightDate}`
-            );
-            console.log(secondFlightResponse)
-            if (secondFlightResponse.data.length > 0) {
-              // Second leg found, integrate both legs
-              integratedConnectingFlights.push({
-                firstLeg: connectingFlight,
-                secondLeg: secondFlightResponse.data[0],
-              });
-            }
-          } catch (secondLegError) {
-            console.info('Error fetching second leg:', secondLegError);
-            toast.info('No second leg of connecting flights available');
-          }
-        }
-        console.log(integratedConnectingFlights)
-        setConnectedFlights(integratedConnectingFlights);
-      } else {
-        toast.info('No connecting flights found for the selected route and date.');
-        setConnectedFlights([]);
+      // Check if scheduleId is available
+      if (!bookingInfo || !bookingInfo.scheduleId) {
+        toast.error('Invalid scheduleId. Please try again.');
+        // Redirect to the find flights page or handle accordingly
+        navigate('/dashboard');
       }
     } catch (error) {
-      console.error('Error during flight search:', error);
-      toast.error('Error during flight search');
+      console.error('Error parsing bookingInfo:', error);
+      toast.error('Error parsing bookingInfo. Please try again.');
+      // Redirect to the find flights page or handle accordingly
+      navigate('/dashboard');
     }
+  }, [navigate]);
+  
+  
 
-    const formattedDate = selectedDate.toISOString().split('T')[0];
-    console.log(SuryaairlineUrl);
-    console.log(airlinesapi);
-    console.log(sourceAirportId);
-    console.log(destinationAirportId);
-    console.log(formattedDate);
-    
-    getIntegratedFlightDetails(
-      SuryaairlineUrl,
-      airlinesapi,
-      sourceAirportId,
-      destinationAirportId,
-      formattedDate
-    );
+  const handleAddUser = () => {
+    setUsers((prevUsers) => [...prevUsers, { name: '', age: '', gender: '' }]);
+  };
+
+  const handleRemoveUser = (index) => {
+    setUsers((prevUsers) => prevUsers.filter((user, i) => i !== index));
+  };
+
+  const handleNext = () => {
+    // Validate user details and booking type
+    if (users.some((user) => !user.name || !user.age || !user.gender) || !bookingType) {
+      toast.error('Please fill in all details and select the booking type.');
+      return;
+    }
+  
+    // Extract user details
+    const userDetails = users.map((user) => ({
+      name: user.name,
+      age: user.age,
+      gender: user.gender,
+    }));
+  
+    // Store the data in sessionStorage
+    const bookingData = {
+      users: userDetails,
+      bookingType,
+      // Add other details as needed
+      // scheduleIdFromSessionStorage: scheduleIdFromSessionStorage, // Remove this line
     };
-    
-    const getIntegratedFlightDetails = async (
-      firstAirlines,
-      secondAirlines,
-      source,
-      destination,
-      dateTime
-) => {
-  const connectionSchedules = [];
-  console.log(dateTime)
-  await Promise.all(
-    Object.entries(firstAirlines).map(
-      async ([firstAirlineName, firstAirline]) => {
-        try {
-          console.log(firstAirline.apiPath, dateTime);
-          console.log(`${firstAirline.apiPath}Integration/connectingflight/${source}/${destination}/${dateTime}`
-          )
-          const firstResponse = await axios.get(
-            `${firstAirline.apiPath}Integration/connectingflight/${source}/${destination}/${dateTime}`
-          );
-          console.log(firstResponse);
-          const firstFlights = firstResponse.data.map((firstFlight) => ({
-            ...firstFlight,
-            airlineName: firstAirlineName,
-            apiPath: firstAirline.apiPath,
-          }));
-          console.log(firstFlights);
-
-          if (firstFlights && firstFlights.length > 0) {
-            await Promise.all(
-              firstFlights.map(async (firstFlight) => {
-                await Promise.all(
-                  Object.entries(secondAirlines).map(
-                    async ([secondAirlineName, secondAirline]) => {
-                      console.log(secondAirline);
-                      try {
-                        console.log(`${secondAirline.apiPath}Integration/directflight/${firstFlight.destinationAirportId}/${destination}/${dateTime}`
-                        )
-                        const secondResponse = await axios.get(`${secondAirline.apiPath}Integration/directflight/${firstFlight.destinationAirportId}/${destination}/${dateTime}`
-                        );
-
-                        console.log(secondResponse);
-                        const secondFlights = secondResponse.data.map(
-                          (secondFlight) => ({
-                            ...secondFlight,
-                            airlineName: secondAirlineName,
-                            apiPath: secondAirline.apiPath,
-                          })
-                        );
-
-                        if (secondFlights && secondFlights.length > 0) {
-                          console.log(secondFlights);
-                          secondFlights.forEach((secondFlight) => {
-                            const connectionSchedule = {
-                              FirstFlight: firstFlight,
-                              SecondFlight: secondFlights,
-                            };
-                            console.log(connectionSchedule);
-                            connectionSchedules.push(connectionSchedule);
-                          });
-                        }
-                      } catch (error) {
-                        console.error(error);
-                      }
-                    }
-                  )
-                );
-              })
-            );
-          }
-        } catch (error) {
-          console.error(error);
-        }
+  
+    // Store the number of passengers separately
+    const numberOfPassengers = users.length;
+  
+    sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
+    sessionStorage.setItem('numberOfPassengers', numberOfPassengers);
+  
+    try {
+      // Parse the bookingInfo JSON string
+      const bookingInfoString = sessionStorage.getItem('bookingInfo');
+      if (!bookingInfoString) {
+        toast.error('Invalid bookingInfo. Please try again.');
+        return;
       }
-    )
-  );
-  console.log(connectionSchedules)
-  setFinalIntegratedConnectingFlights(connectionSchedules); // Uncomment this line if you want to use this data in your application
-};
-////////////
-const calculateArrivalTime = (departureDateTime, duration) => {
-  const departureTime = new Date(departureDateTime).getTime();
-  const durationMilliseconds = durationToMilliseconds(duration);
-  const arrivalTime = new Date(departureTime + durationMilliseconds);
-  return arrivalTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-};
-
-
-const calculateArrivalDate = (departureDateTime, duration) => {
-  const departureTime = new Date(departureDateTime).getTime();
-  const durationMilliseconds = durationToMilliseconds(duration);
-  const arrivalTime = new Date(departureTime + durationMilliseconds);
-  return arrivalTime.toISOString().split('T')[0];
-};
-const durationToMilliseconds = (duration) => {
-  const [hours, minutes, seconds] = duration.split(':').map(Number);
-  return (hours * 60 * 60 + minutes * 60 + seconds) * 1000;
-};
-
-const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightScheduleId, firstAirlineApiPath, secondAirlineApiPath,firstAirlineName,secondAirlineName,firstFlightSourceId,secondFlightSourceId,firstFlightDestinationId,secondFlightDestinationId,firstflightName,secondflightName,firstFlightDateTime,secondFlightDateTime) => {
-  const isAuthenticated = localStorage.getItem('userId') !== null;
-
-  if (isAuthenticated) {
-    const userId = localStorage.getItem('userId');
-    const scheduleIds = [firstflightScheduleId, secondflightScheduleId];
-    
-    // Get the API paths from the function parameters and save them in sessionStorage
-    const apiPaths = [firstAirlineApiPath, secondAirlineApiPath];
-    console.log(apiPaths)
-    //const flightName = [firstAirlineName,firstFlightSourceId,firstFlightDestinationId,firstflightName]
-    const airlineNames= [firstAirlineName,secondAirlineName]
-    const flightNames= [firstflightName,secondflightName]
-    const sourceIds=[firstFlightSourceId,secondFlightSourceId]
-    const destinationIds=[firstFlightDestinationId,secondFlightDestinationId]
-    const dateTimes=[firstFlightDateTime,secondFlightDateTime]
-    //const secondFlightDetails = [secondAirlineName,secondFlightSourceId,secondFlightDestinationId,secondflightName]
-    console.log(dateTimes)
-    
-    console.log(airlineNames)
-    sessionStorage.setItem('integratedBookingInfo', JSON.stringify({ userId, scheduleIds, apiPaths,flightNames,sourceIds,destinationIds,airlineNames,dateTimes}));
-    
-    // Navigate to the booking details page
-    navigate(`/IntegratedBooking/integratedbookingdetails/${firstflightScheduleId}`);
-  } else {
-    navigate('/login');
-  }
-};
-
- 
   
-//////////
-
+      const bookingInfo = JSON.parse(bookingInfoString);
   
-  const handleBookNow = (scheduleId) => {
-    const isAuthenticated = localStorage.getItem('userId') !== null;
-
-    if (isAuthenticated) {
-      const userId = localStorage.getItem('userId');
-      sessionStorage.setItem('bookingInfo', JSON.stringify({ userId, scheduleId }));
-      navigate(`/Booking/bookingdetails/${scheduleId}`);
-    } else {
-      navigate('/login');
+      // Check if scheduleId is available
+      if (!bookingInfo || !bookingInfo.scheduleId) {
+        toast.error('Invalid scheduleId. Please try again.');
+        return;
+      }
+  
+      // Redirect to seat selection page with the correct scheduleId
+      navigate(`/Booking/seatbooking/${bookingInfo.scheduleId}`);
+    } catch (error) {
+      console.error('Error parsing bookingInfo:', error);
+      toast.error('Error parsing bookingInfo. Please try again.');
     }
   };
-
-  const handleBookNowConnecting = (firstLegScheduleId, secondLegScheduleId) => {
-    const isAuthenticated = localStorage.getItem('userId') !== null;
   
-    if (isAuthenticated) {
-      const userId = localStorage.getItem('userId');
-      const bookingInfo = { userId, scheduleIds: [firstLegScheduleId, secondLegScheduleId] };
-      sessionStorage.setItem('bookingInfo', JSON.stringify(bookingInfo));
-      navigate(`/ConnectBooking/Connectbookingdetails/${firstLegScheduleId}`);
-    } else {
-      navigate('/login');
-    }
-  };
-
-  const calculateDepartureTime = (arrivalTime, duration) => {
-    const arrivalDateTime = new Date(arrivalTime);
-    const durationParts = duration.split(':');
-    const hours = parseInt(durationParts[0], 10);
-    const minutes = parseInt(durationParts[1], 10);
-
-    const departureDateTime = new Date(arrivalDateTime);
-    departureDateTime.setHours(departureDateTime.getHours() + hours);
-    departureDateTime.setMinutes(departureDateTime.getMinutes() + minutes);
-
-    return departureDateTime;
-  };
+  
+  
 
   return (
-    
-    <div className="container mt-4">
-      <ImageSlider />
-      <h2 className="mb-4">Find Your Destination</h2>
-      <div className="row">
-        <div className="col-md-3">
-          <div className="form-group">
-            <label htmlFor="sourceAirport">Source Airport:</label>
-            <select
-              id="sourceAirport"
-              className="form-control"
-              value={sourceAirportId}
-              onChange={(e) => setSourceAirportId(e.target.value)}
-            >
-              <option value="">Select Source Airport</option>
-              {cityNames.map((airport, index) => (
-                <option key={index} value={airport.airportId}>
-                  {airport.city}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <div className="col-md-3">
-          <div className="form-group">
-            <label htmlFor="destinationAirport">Destination Airport:</label>
-            <select
-              id="destinationAirport"
-              className="form-control"
-              value={destinationAirportId}
-              onChange={(e) => setDestinationAirportId(e.target.value)}
-            >
-              <option value="">Select Destination Airport</option>
-              {cityNames.map((airport, index) => (
-                <option key={index} value={airport.airportId}>
-                  {airport.city}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <div className="col-md-3">
-          <div className="form-group">
-            <label htmlFor="departureDate">Departure Date:</label>
-            <DatePicker
-             id="departureDate"
-             selected={selectedDate}
-             onChange={(date) => setSelectedDate(date)}
-             dateFormat="MMMM d, yyyy"
-             minDate={new Date(new Date().getTime() + 24 * 60 * 60 * 1000)} // Set minDate to tomorrow
-             className="form-control"
-           />
-          </div>
-        </div>
-        <div className="col-md-3">
-          <button onClick={handleSearch} className="btn btn-primary">
-            Search Flights
-          </button>
-        </div>
-      </div>
-      {availableFlights.length > 0 && (
-  <div className="mt-4">
-    <h2 className="mb-3">Available Flights</h2>
-    <div className="row">
-      {availableFlights.map((flight) => (
-        <div key={flight.scheduleId} className="col-md-12 mb-3">
-          <div className="card">
-            <div className="card-body">
-              <div className="text-center mb-3">
-                <FontAwesomeIcon icon={faPlane} className="mr-2" style={{ fontSize: '2em' }} />
-                <span className="airline-name">{flight.flightName}</span>
+    <Layout>
+    <div className="container mt-4" style={{ width: '40vw' }}>
+      <h1>Booking Details</h1>
+      <form>
+        {users.map((user, index) => (
+          <div key={index} className="mb-3">
+            <h5>Passenger {index + 1}</h5>
+            <div className="row">
+              <div className="col-md-4">
+                <label htmlFor={`name${index}`} className="form-label">
+                  Name:
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id={`name${index}`}
+                  value={user.name}
+                  onChange={(e) => setUsers((prevUsers) => updateUser(prevUsers, index, 'name', e.target.value))}
+                />
               </div>
-              <div className="d-flex align-items-center justify-content-between mb-3">
-                <div className="text-center">
-                  <p className="card-text">
-                    <strong>From:</strong> {flight.sourceCity} ({flight.sourceAirportName})
-                  </p>
-                  <p className="card-text">
-                    <strong>Arrival Time:</strong>{' '}
-                    {new Date(flight.dateTime).toLocaleString('en-GB')}
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="card-text">
-                    <strong>To:</strong> {flight.destinationCity} ({flight.destinationAirportName})
-                  </p>
-                  <p className="card-text">
-                    <strong>Departure Time:</strong>{' '}
-                    {calculateDepartureTime(flight.dateTime, flight.flightDuration).toLocaleString('en-GB')}
-                  </p>
-                </div>
+              <div className="col-md-4">
+                <label htmlFor={`age${index}`} className="form-label">
+                  Age:
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id={`age${index}`}
+                  value={user.age}
+                  onChange={(e) => setUsers((prevUsers) => updateUser(prevUsers, index, 'age', e.target.value))}
+                />
               </div>
-              <div className="text-center">
-                <p className="card-text">
-                  <strong>Duration:</strong> {flight.flightDuration}
-                </p>
+              <div className="col-md-4">
+                <label htmlFor={`gender${index}`} className="form-label">
+                  Gender:
+                </label>
+                <select
+                  id={`gender${index}`}
+                  className="form-control"
+                  value={user.gender}
+                  onChange={(e) => setUsers((prevUsers) => updateUser(prevUsers, index, 'gender', e.target.value))}
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Others">Others</option>
+                </select>
               </div>
-              <button onClick={() => handleBookNow(flight.scheduleId)} className="btn btn-primary mt-3">
-                Book Now
+            </div>
+            {index > 0 && (
+              <button type="button" className="btn btn-danger mt-2" onClick={() => handleRemoveUser(index)}>
+                Remove User
               </button>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
-
-{connectedFlights.length > 0 && (
-  <div className="mt-4">
-    <h2 className="mb-3">Connecting Flights</h2>
-    <div className="row">
-      {connectedFlights.map((connectingFlights, index) => (
-        <div key={index} className="col-md-12 mb-3">
-          <div className="card">
-            <div className="card-body">
-              {/* ... (existing code) */}
-              <div className="text-center mb-3">
-                  <FontAwesomeIcon icon={faPlane} className="mr-2" style={{ fontSize: '2em' }} />
-                  <span className="airline-name">{connectingFlights.firstLeg.flightName}</span>
-              </div>
-                <div className="mt-2" style={{ color: 'blue', fontWeight: 'bold' }}>
-                  <p>First Flight</p>
-                </div>
-
-              {/* Swap the positions of arrival time and departure time for the second leg */}
-              <div className="d-flex align-items-center justify-content-between mb-3">
-                <div className="text-center">
-                  <p className="card-text">
-                    <strong>From:</strong> {connectingFlights.firstLeg.sourceCity} ({connectingFlights.firstLeg.sourceAirportName})
-                  </p>
-                  <p className="card-text">
-                    <strong>Arrival Time:</strong>{' '}
-                    {new Date(connectingFlights.firstLeg.dateTime).toLocaleString('en-GB')}
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="card-text">
-                    <strong>To:</strong> {connectingFlights.firstLeg.destinationCity} ({connectingFlights.firstLeg.destinationAirportName})
-                  </p>
-                  <p className="card-text">
-                    <strong>Departure Time:</strong>{' '}
-                    {calculateDepartureTime(connectingFlights.firstLeg.dateTime, connectingFlights.firstLeg.flightDuration).toLocaleString('en-GB')}
-                  </p>
-                </div>
-              </div>
-                
-                {/* Duration for the first leg */}
-                <div className="text-center">
-                  <p className="card-text">
-                    <strong>Duration:</strong> {connectingFlights.firstLeg.flightDuration}
-                  </p>
-                </div>
-
-                {/* Text for the second flight */}
-                <div className="mt-2 mb-0" style={{ color: 'blue', fontWeight: 'bold' }}>
-                  <p>Second Flight</p>
-                </div>
-                {/* Details for the second leg */}
-                <div className="text-center mb-3">
-                  <FontAwesomeIcon icon={faPlane} className="mr-2" style={{ fontSize: '2em' }} />
-                  <span className="airline-name">{connectingFlights.secondLeg.flightName}</span>
-                </div>
-                <div className="d-flex align-items-center justify-content-between mb-3">
-                  <div className="text-center">
-                    <p className="card-text">
-                      <strong>From:</strong> {connectingFlights.secondLeg.sourceCity} ({connectingFlights.secondLeg.sourceAirportName})
-                    </p>
-                    <p className="card-text">
-                      <strong>Arrival Time:</strong> {new Date(connectingFlights.secondLeg.dateTime).toLocaleString('en-GB')}
-                    </p>
-                    
-                  </div>
-                  <div className="text-center">
-                    <p className="card-text">
-                      <strong>To:</strong> {connectingFlights.secondLeg.destinationCity} ({connectingFlights.secondLeg.destinationAirportName})
-                    </p>
-                    <p className="card-text">
-                      <strong>Departure Time:</strong>{' '}
-                      {calculateDepartureTime(connectingFlights.secondLeg.dateTime, connectingFlights.secondLeg.flightDuration).toLocaleString('en-GB')}
-                    </p>
-                    
-                  </div>
-                </div>
-                
-                {/* Duration for the second leg */}
-                <div className="text-center">
-                  <p className="card-text">
-                    <strong>Duration:</strong> {connectingFlights.secondLeg.flightDuration}
-                  </p>
-                </div>
-
-                {/* Book Now button for connected flights */}
-                <button onClick={() => handleBookNowConnecting(connectingFlights.firstLeg.scheduleId, connectingFlights.secondLeg.scheduleId)} className="btn btn-primary mt-3">
-                  Book Now
-                </button>
-              </div>
-            </div>
+            )}
           </div>
         ))}
-      </div>
-    </div>
-  )}
-
-<div className="container mt-4">
-  <div className="m-5">
-    {finalIntegratedConnectingFlights.map((connection, index) => (
-      <div key={index} className="flex justify-between">
-        {connection.SecondFlight.map((flight, i) => (
-          <div key={i} className="flex border p-2 hover:cursor-pointer m-5">
-            <div className="p-5">
-              <h3 className="text-center">{flight.airlineName}</h3>
-              <ul>
-                <li>{flight.flightName}</li>
-                <li>
-                  {flight.sourceAirportName} to {flight.destinationAirportName}
-                </li>
-                <li>Flight Duration: {flight.flightDuration}</li>
-                <li>
-                  Departure Date: {flight.dateTime?.split("T")[0]}, Departure Time:{" "}
-                  {flight.dateTime?.split("T")[1]}
-                </li>
-                <li>
-                  Arrival Date:{" "}
-                  {calculateArrivalDate(flight.dateTime, flight.flightDuration)}, Arrival
-                  Time: {calculateArrivalTime(flight.dateTime, flight.flightDuration)}
-                </li>
-              </ul>
-            </div>
+        <div className="mb-3">
+          <label htmlFor="bookingType" className="form-label">
+            Booking Type:
+          </label>
+          <select
+            id="bookingType"
+            className="form-control"
+            value={bookingType}
+            onChange={(e) => setBookingType(e.target.value)}
+          >
+            <option value="">Select Booking Type</option>
+            <option value="ONEWAY">One Way</option>
+            <option value="ROUNDTRIP">Round Trip</option>
+          </select>
+        </div>
+        <div className="row">
+          <div className="col">
+            <button type="button" className="btn btn-primary" onClick={handleAddUser}>
+              Add Another User
+            </button>
           </div>
-        ))}
-        <div className="flex border p-2 hover:cursor-pointer m-5">
-          <div className="p-5">
-            <h3 className="text-center">{connection.FirstFlight.airlineName}</h3>
-            <ul>
-              <li>{connection.FirstFlight.flightName}</li>
-              <li>
-                {connection.FirstFlight.sourceAirportName} to{" "}
-                {connection.FirstFlight.destinationAirportName}
-              </li>
-              <li>Flight Duration: {connection.FirstFlight.flightDuration}</li>
-              <li>
-                Departure Date: {connection.FirstFlight.dateTime?.split("T")[0]}, Departure
-                Time: {connection.FirstFlight.dateTime?.split("T")[1]}
-              </li>
-              <li>
-                Arrival Date:{" "}
-                {calculateArrivalDate(
-                  connection.FirstFlight.dateTime,
-                  connection.FirstFlight.flightDuration
-                )}, Arrival Time:{" "}
-                {calculateArrivalTime(
-                  connection.FirstFlight.dateTime,
-                  connection.FirstFlight.flightDuration
-                )}
-              </li>
-            </ul>
-
-            {/* Common "Book Now" button */}
-            <button
-              onClick={() =>
-               handleBookNowIntegratedConnecting(
-                connection.FirstFlight.scheduleId,
-                connection.SecondFlight[0].scheduleId,
-                connection.FirstFlight.apiPath,
-                connection.SecondFlight[0].apiPath,
-                connection.FirstFlight.airlineName,
-                connection.SecondFlight[0].airlineName,
-                connection.FirstFlight.sourceAirportId,
-                connection.SecondFlight[0].sourceAirportId,
-                connection.FirstFlight.destinationAirportId,
-                connection.SecondFlight[0].destinationAirportId,
-                connection.FirstFlight.flightName,
-                connection.SecondFlight[0].flightName,
-                connection.FirstFlight.dateTime,
-                connection.SecondFlight[0].dateTime
-                
-          
-               )
-             }
-           >
-             Book Now
-           </button>
+          <div className="col">
+            <button type="button" className="btn btn-success" onClick={handleNext}>
+              Next
+            </button>
           </div>
         </div>
-      </div>
-    ))}
-  </div>
-</div>
-
-
-</div>
+      </form>
+    </div>
+    </Layout>
   );
-}
+};
 
-export default FindFlights;
+const updateUser = (prevUsers, index, field, value) => {
+  const updatedUsers = [...prevUsers];
+  updatedUsers[index][field] = value;
+  return updatedUsers;
+};
+
+export default BookingDetails;

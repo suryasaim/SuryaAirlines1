@@ -11,13 +11,16 @@ const Schedule = () => {
   useEffect(() => {
     async function fetchSchedules() {
       try {
-        const response = await axios.get('http://192.168.10.71:98/api/Schedule/GetSchedules');
+        const token = localStorage.getItem('authToken'); // Replace with the actual token
+        const headers = { Authorization: `Bearer ${token}` };
+
+        const response = await axios.get('http://192.168.10.71:98/api/Schedule/GetSchedules', { headers });
         const schedulesData = response.data;
 
         // Fetch airport names for source and destination airports
         const airportNamesPromises = schedulesData.map(async (schedule) => {
-          const sourceAirportResponse = await axios.get(`http://192.168.10.71:98/api/Airport/${schedule.sourceAirportId}`);
-          const destinationAirportResponse = await axios.get(`http://192.168.10.71:98/api/Airport/${schedule.destinationAirportId}`);
+          const sourceAirportResponse = await axios.get(`http://192.168.10.71:98/api/Airport/${schedule.sourceAirportId}`, { headers });
+          const destinationAirportResponse = await axios.get(`http://192.168.10.71:98/api/Airport/${schedule.destinationAirportId}`, { headers });
 
           const sourceAirportName = sourceAirportResponse.data.airportName;
           const destinationAirportName = destinationAirportResponse.data.airportName;
@@ -29,27 +32,11 @@ const Schedule = () => {
           };
         });
 
-        // Fetch seats information for each schedule
-        // const seatsPromises = schedulesData.map(async (schedule) => {
-        //   const seatsResponse = await axios.get(`https://localhost:7200/api/Seat/${schedule.scheduleId}`);
-        //   return {
-        //     ...schedule,
-        //     seats: seatsResponse.data,
-        //   };
-        // });
-
-        const [schedulesWithAirports, schedulesWithSeats] = await Promise.all([
+        const [schedulesWithAirports] = await Promise.all([
           Promise.all(airportNamesPromises),
-          //Promise.all(seatsPromises),
         ]);
 
-        // Combine airport names and seats information for each schedule
-        const combinedSchedules = schedulesWithAirports.map((schedule) => ({
-          ...schedule,
-          //seats: schedulesWithSeats.find((seatSchedule) => seatSchedule.scheduleId === schedule.scheduleId)?.seats || [],
-        }));
-
-        setSchedules(combinedSchedules);
+        setSchedules(schedulesWithAirports);
       } catch (error) {
         console.error('Error fetching schedules:', error);
       }

@@ -17,6 +17,9 @@ const SeatSelection = () => {
   useEffect(() => {
     const fetchSeats = async () => {
       try {
+        // Retrieve JWT token from localStorage
+        const token = localStorage.getItem('authToken');
+
         // Retrieve scheduleId from session storage
         const bookingInfoString = sessionStorage.getItem('bookingInfo');
         if (!bookingInfoString) {
@@ -46,7 +49,12 @@ const SeatSelection = () => {
         // Set the numberOfPassengers in the component state
         setNumberOfPassengers(parseInt(storedNumberOfPassengers, 10) || 1);
 
-        const response = await fetch(`http://192.168.10.71:98/api/Seats/BySchedule/${bookingInfo.scheduleId}`);
+        const response = await fetch(`http://192.168.10.71:98/api/Seats/BySchedule/${bookingInfo.scheduleId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the JWT token in the headers
+          },
+        });
+
         if (!response.ok) {
           throw new Error('Failed to fetch seats');
         }
@@ -155,7 +163,7 @@ const SeatSelection = () => {
 
   return (
     <Layout>
-      <Container  style={{ width: '60vw', height: '100vh',background: 'rgba(255, 255, 255, 0.8)', padding: '10px' }}>
+      <Container  style={{ width: '60vw',background: 'rgba(255, 255, 255, 0.8)', }}>
         <h2 className="mt-4 mb-4">Seat Selection</h2>
         <Row xs={2} md={3} lg={6} className="mb-4">
           {availableSeats.map((seat) => (

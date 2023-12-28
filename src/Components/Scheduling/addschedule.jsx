@@ -19,16 +19,29 @@ const ScheduleFlights = () => {
     numberOfDays: 1, // New field for the number of days
     // Add other fields as needed
   });
-
+  
   useEffect(() => {
-    axios.get('http://192.168.10.71:98/api/Flight/GetFlightdetails')
-      .then(response => setFlightNames(response.data))
+    const token = localStorage.getItem('authToken');
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+    
+  
+    axios.get('http://192.168.10.71:98/api/Flight/GetFlightdetails', { headers })
+      .then(response => {
+        
+        setFlightNames(response.data);
+      })
       .catch(error => console.error('Error fetching flight names:', error));
-
-    axios.get('http://192.168.10.71:98/api/Airport')
-      .then(response => setAirportNames(response.data))
+  
+    axios.get('http://192.168.10.71:98/api/Airport', { headers })
+      .then(response => {
+        //console.log('Airport details response:', response.data);
+        setAirportNames(response.data);
+      })
       .catch(error => console.error('Error fetching airport names:', error));
   }, []);
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -80,14 +93,20 @@ const ScheduleFlights = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const numberOfDays = parseInt(scheduleData.numberOfDays, 10);
-
+  
       for (let i = 0; i < numberOfDays; i++) {
         const currentDate = new Date(scheduleData.arrivalDateTime);
         currentDate.setDate(currentDate.getDate() + i);
-
+  
+        const token = localStorage.getItem('authToken'); // Replace with the actual token
+        const headers = {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        };
+  
         // Convert flightName, sourceAirportId, and destinationAirportId to strings
         const requestData = {
           ...scheduleData,
@@ -97,17 +116,18 @@ const ScheduleFlights = () => {
           flightDuration: formatFlightDuration(parseFlightDuration(scheduleData.flightDuration)),
           dateTime: formatDateTime(currentDate),
         };
-        
+  
         // Include flightDuration in the API request
-        await axios.post('http://192.168.10.71:98/api/Schedule/CreateSchedule', requestData);
+        await axios.post('http://192.168.10.71:98/api/Schedule/CreateSchedule', requestData, { headers });
       }
-
+  
       toast.success('Flights scheduled successfully');
     } catch (error) {
       console.error('Error scheduling flights:', error);
       toast.info('Schedule Flight At least One Day Before');
     }
   };
+  
 
   return (
     <AdminLayout>

@@ -5,7 +5,6 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AdminLayout from '../adminlayout';
 
-
 function AddAirport() {
   const [airport, setAirport] = useState({
     airportId: '',
@@ -26,7 +25,15 @@ function AddAirport() {
     e.preventDefault();
 
     try {
-      await axios.post('http://192.168.10.71:98/api/Airport', airport);
+      const token = localStorage.getItem('authToken'); // Get JWT token from local storage
+      const headers = {
+        Authorization: `Bearer ${token}`, // Include the JWT token in the Authorization header
+        'Content-Type': 'application/json', // Set content type to JSON
+      };
+
+      // Make the API request with authentication headers
+      await axios.post('http://192.168.10.71:98/api/Airport', airport, { headers });
+
       // After successful submission, clear the form fields
       setAirport({
         airportId: '',
@@ -34,17 +41,34 @@ function AddAirport() {
         airportName: '',
         state: '',
       });
+
       toast.success('Airport added successfully');
     } catch (error) {
-      console.error('Error adding airport:', error);
-      toast.error('Error adding airport');
+      handleRequestError(error, 'Error adding airport');
+    }
+  };
+
+  const handleRequestError = (error, defaultMessage) => {
+    console.error('Request failed:', error);
+
+    if (error.response) {
+      const { status } = error.response;
+
+      if (status === 401) {
+        // Unauthorized, handle accordingly (e.g., redirect to login)
+        toast.error('Unauthorized: Please log in.');
+      } else {
+        toast.error(`Request failed with status ${status}`);
+      }
+    } else {
+      toast.error(defaultMessage);
     }
   };
 
   return (
     <AdminLayout>
-      <div>
-        <h1>Add Airport</h1>
+      <div className="container mt-5" style={{ width: '30vw', height: '100vh' }}>
+        <h2>Add Airport</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="airportId" className="form-label">

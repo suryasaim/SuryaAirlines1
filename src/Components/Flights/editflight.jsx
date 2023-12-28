@@ -16,10 +16,13 @@ function EditFlight() {
   useEffect(() => {
     async function fetchFlight() {
       try {
-        const response = await axios.get(`http://192.168.10.71:98/api/Flight/${id}`);
+        const token = 'YOUR_JWT_TOKEN'; // Replace with the actual token
+        const headers = { Authorization: `Bearer ${token}` };
+
+        const response = await axios.get(`http://192.168.10.71:98/api/Flight/${id}`, { headers });
         setFlight(response.data);
       } catch (error) {
-        console.error('Error fetching flight:', error);
+        handleRequestError(error, 'Error fetching flight');
       }
     }
   
@@ -41,21 +44,44 @@ function EditFlight() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
-      await axios.patch(`http://192.168.10.71:98/api/Flight/${id}`, flight);
+      const token = localStorage.getItem('authToken');
+      const headers = { 
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json', // Set the Content-Type header
+      };
+  
+      await axios.patch(`http://192.168.10.71:98/api/Flight/${id}`, flight, { headers });
       toast.success('Flight updated successfully');
       //navigate('/admin/Flights/Flights'); // Redirect to Flights page
     } catch (error) {
-      console.error('Error updating flight:', error);
-      toast.error('Error updating flight');
+      handleRequestError(error, 'Error updating flight');
+    }
+  };
+  
+
+  const handleRequestError = (error, defaultMessage) => {
+    console.error('Request failed:', error);
+
+    if (error.response) {
+      const { status } = error.response;
+
+      if (status === 401) {
+        // Unauthorized, handle accordingly (e.g., redirect to login)
+        toast.error('Unauthorized: Please log in.');
+      } else {
+        toast.error(`Request failed with status ${status}`);
+      }
+    } else {
+      toast.error(defaultMessage);
     }
   };
 
   return (
     <AdminLayout>
-      <div>
-        <h1>Edit Flight</h1>
+      <div className="container mt-5" style={{ width: '50vw', height: '100vh' }}>
+        <h2>Edit Flight</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="flightCapacity" className="form-label">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -21,9 +21,15 @@ function AddFlight() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
-      await axios.post('http://192.168.10.71:98/api/Flight/Flightdetails', flight);
+      const token = localStorage.getItem('authToken'); // Replace with the actual token
+      const headers = { 
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json', // Set the Content-Type header
+      };
+  
+      await axios.post('http://192.168.10.71:98/api/Flight/Flightdetails', flight, { headers });
       toast.success('Flight added successfully');
       // After successful submission, clear the form fields
       setFlight({
@@ -31,15 +37,31 @@ function AddFlight() {
         isActive: false,
       });
     } catch (error) {
-      console.error('Error adding flight:', error);
-      toast.error('Error adding flight');
+      handleRequestError(error, 'Error adding flight');
+    }
+  };
+
+  const handleRequestError = (error, defaultMessage) => {
+    console.error('Request failed:', error);
+
+    if (error.response) {
+      const { status } = error.response;
+
+      if (status === 401) {
+        // Unauthorized, handle accordingly (e.g., redirect to login)
+        toast.error('Unauthorized: Please log in.');
+      } else {
+        toast.error(`Request failed with status ${status}`);
+      }
+    } else {
+      toast.error(defaultMessage);
     }
   };
 
   return (
     <AdminLayout>
-      <div>
-        <h1>Add Flight</h1>
+      <div className="container mt-5" style={{ width: '40vw', height: '100vh' }}>
+        <h2>Add Flight</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="flightCapacity" className="form-label">
