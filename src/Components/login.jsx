@@ -59,13 +59,14 @@ function Login() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        'http://192.168.10.71:98/api/Authorization/login',
+        'http://192.168.10.70:98/api/Authorization/login',
         formData
       );
 
       const authToken = response.data.token;
       const loggedInUserId = response.data.userId;
       const userRole = response.data.role[0]; // Assuming the role is the first element in the array
+      const email =response.data.email;
 
       if (!authToken || !loggedInUserId || !userRole) {
         console.error('Login failed: Token, User ID, or Role not found in the response');
@@ -76,6 +77,7 @@ function Login() {
       localStorage.setItem('authToken', authToken);
       localStorage.setItem('userId', loggedInUserId);
       localStorage.setItem('userRole', userRole);
+      localStorage.setItem('email', email);
 
       toast.success('Login successful');
       updateLastActivityTimestamp();
@@ -105,10 +107,13 @@ function Login() {
     localStorage.removeItem('userId');
     localStorage.removeItem('userRole');
     localStorage.removeItem('lastActivityTimestamp');
+    localStorage.removeItem('email');
+
   };
 
   return (
-    <div className="container mt-5" style={{ width: '30vw' }}>
+  <div className="d-flex justify-content-center align-items-center">    
+    <div className="flex justify-center items-center border bg-white p-3 bold  rounded hover:cursor-pointer m-3"style={{  width: '45vw',boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)' }}>
       <h3>Login Form</h3>
       <form onSubmit={handleLogin}>
         <div className="mb-3">
@@ -131,21 +136,23 @@ function Login() {
             onChange={handleInputChange}
           />
         </div>
-        <div className="d-flex justify-content-center">
-          <button type="submit" className="btn btn-primary">
-            Login
-          </button>
-          <div>
-            <Link to="/dashboard" className="btn btn-success">
-              Continue Without Login
-            </Link>
-            <Link to="/" className="btn btn-warning mt-2">
+        <div className="d-flex flex-column align-items-center row p-3">
+         <button type="submit" className="btn btn-primary mb-3 ">
+           Login
+         </button>
+         <div className="d-flex">
+           <Link to="/" className="btn btn-warning m-auto">
               Back to Registration
-            </Link>
-          </div>
+           </Link> 
+           {/* <Link to="/dashboard" className="btn btn-success mr-3"style={{ marginLeft: '100px' }}>
+              Continue Without Login
+           </Link> */}
+         </div>
         </div>
+
       </form>
     </div>
+  </div>  
   );
 }
 

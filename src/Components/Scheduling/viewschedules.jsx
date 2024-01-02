@@ -4,9 +4,13 @@ import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AdminLayout from '../adminlayout';
+import ReactPaginate from 'react-paginate';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Schedule = () => {
   const [schedules, setSchedules] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const perPage = 20;
 
   useEffect(() => {
     async function fetchSchedules() {
@@ -14,13 +18,13 @@ const Schedule = () => {
         const token = localStorage.getItem('authToken'); // Replace with the actual token
         const headers = { Authorization: `Bearer ${token}` };
 
-        const response = await axios.get('http://192.168.10.71:98/api/Schedule/GetSchedules', { headers });
+        const response = await axios.get('http://192.168.10.70:98/api/Schedule/GetSchedules', { headers });
         const schedulesData = response.data;
 
         // Fetch airport names for source and destination airports
         const airportNamesPromises = schedulesData.map(async (schedule) => {
-          const sourceAirportResponse = await axios.get(`http://192.168.10.71:98/api/Airport/${schedule.sourceAirportId}`, { headers });
-          const destinationAirportResponse = await axios.get(`http://192.168.10.71:98/api/Airport/${schedule.destinationAirportId}`, { headers });
+          const sourceAirportResponse = await axios.get(`http://192.168.10.70:98/api/Airport/${schedule.sourceAirportId}`, { headers });
+          const destinationAirportResponse = await axios.get(`http://192.168.10.70:98/api/Airport/${schedule.destinationAirportId}`, { headers });
 
           const sourceAirportName = sourceAirportResponse.data.airportName;
           const destinationAirportName = destinationAirportResponse.data.airportName;
@@ -45,14 +49,24 @@ const Schedule = () => {
     fetchSchedules();
   }, []);
 
+  const handlePageClick = (data) => {
+    const selectedPage = data.selected;
+    setCurrentPage(selectedPage);
+  };
+
+  const paginatedSchedules = schedules.slice(
+    currentPage * perPage,
+    (currentPage + 1) * perPage
+  );
+  
   return (
     <AdminLayout>
-      <div>
-        <h1>Schedule Flights</h1>
+      <div  >
+        <h2>Flight Schedules</h2>
         <Link to="/admin/Scheduling/addschedule" className="btn btn-success mb-3">
           Schedule Flight
         </Link>
-        <table className="table">
+        <table className="table"style={{  borderRadius: '10px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'}} >
           <thead>
             <tr>
               <th>Schedule ID</th>
@@ -62,14 +76,11 @@ const Schedule = () => {
               <th>Arrival Datetime</th>
               <th>Departure Datetime</th>
               <th>Duration</th>
-        
               <th>Flight Status</th>
-              {/* <th>Seats Available</th> */}
-              {/* <th>Actions</th> */}
             </tr>
           </thead>
           <tbody>
-            {schedules.map((schedule) => (
+            {paginatedSchedules.map((schedule) => (
               <tr key={schedule.scheduleId}>
                 <td>{schedule.scheduleId}</td>
                 <td>{schedule.flightName}</td>
@@ -79,20 +90,27 @@ const Schedule = () => {
                 <td>{calculateDepartureDateTime(schedule)}</td>
                 <td>{schedule.flightDuration}</td>
                 <td>{schedule.isActive ? 'Active' : 'Inactive'}</td>
-                {/* <td>{calculateSeatsAvailable(schedule.seats)}</td> */}
-                {/* <td>
-                  <Link to={`/admin/Scheduling/editschedule/${schedule.scheduleId}`} className="btn btn-primary me-2">
-                    Update
-                  </Link>
-                  <button className="btn btn-danger" onClick={() => handleDelete(schedule.scheduleId)}>
-                    Delete
-                  </button>
-                </td> */}
-                
               </tr>
             ))}
           </tbody>
         </table>
+        <div className="container mt-4  bg-white" style={{ width: '38vw', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'}}>
+        <ReactPaginate
+          previousLabel={'Previous'}
+          nextLabel={'Next'}
+          breakLabel={'...'}
+          breakClassName={'break-me'}
+          pageCount={Math.ceil(schedules.length / perPage)}
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={5}
+          onPageChange={handlePageClick}
+          containerClassName={'pagination justify-content-center bg-white p-2 '} // Bootstrap class for centering
+          activeClassName={'active'}
+          pageLinkClassName={'btn btn-outline-warning m-auto'} // Bootstrap class for button styling
+          previousLinkClassName={'btn btn-outline-success '} // Bootstrap class for button styling
+          nextLinkClassName={'btn btn-outline-success'} // Bootstrap class for button styling
+        />
+        </div>
       </div>
     </AdminLayout>
   );

@@ -1,242 +1,143 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Layout from '../layout';
+import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import AdminLayout from '../adminlayout';
 
-const Tickets = () => {
-  const [ticketDetails, setTicketDetails] = useState([]);
-  const [connectingTicketDetails, setConnectingTicketDetails] = useState([]);
+const Schedule = () => {
+  const [schedules, setSchedules] = useState([]);
 
   useEffect(() => {
-    const fetchTicketDetails = async () => {
+    async function fetchSchedules() {
       try {
-        // Get user id from local storage
-        const userId = localStorage.getItem('userId');
+        const token = localStorage.getItem('authToken'); // Replace with the actual token
+        const headers = { Authorization: `Bearer ${token}` };
 
-        if (!userId) {
-          console.error('User id not found in local storage');
-          return;
-        }
+        const response = await axios.get('http://192.168.10.71:98/api/Schedule/GetSchedules', { headers });
+        const schedulesData = response.data;
 
-        // Get the token from local storage
-        const token = localStorage.getItem('authToken');
+        // Fetch airport names for source and destination airports
+        const airportNamesPromises = schedulesData.map(async (schedule) => {
+          const sourceAirportResponse = await axios.get(`http://192.168.10.71:98/api/Airport/${schedule.sourceAirportId}`, { headers });
+          const destinationAirportResponse = await axios.get(`http://192.168.10.71:98/api/Airport/${schedule.destinationAirportId}`, { headers });
 
-        // Fetch regular ticket details using the FlightTicket API with authentication
-        const response = await axios.get(`http://192.168.10.71:98/api/FlightTicket/flighttickets/${userId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
+          const sourceAirportName = sourceAirportResponse.data.airportName;
+          const destinationAirportName = destinationAirportResponse.data.airportName;
+
+          return {
+            ...schedule,
+            sourceAirportName,
+            destinationAirportName,
+          };
         });
 
-        const tickets = response.data;
+        const [schedulesWithAirports] = await Promise.all([
+          Promise.all(airportNamesPromises),
+        ]);
 
-        // Fetch schedule details for each regular ticket
-        const ticketDetailsWithSchedule = await Promise.all(
-          tickets.map(async (ticket) => {
-            const scheduleResponse = await axios.get(`http://192.168.10.71:98/api/Schedule/GetSchedules/${ticket.scheduleId}`, {
-              headers: {
-                'Authorization': `Bearer ${token}`,
-              },
-            });
-            const schedule = scheduleResponse.data;
-
-            return { ...ticket, schedule, type: 'regular' };
-          })
-        );
-
-        setTicketDetails(ticketDetailsWithSchedule);
+        setSchedules(schedulesWithAirports);
       } catch (error) {
-        console.error('Error fetching regular ticket details:', error);
+        console.error('Error fetching schedules:', error);
       }
-    };
+    }
 
-    const fetchConnectingTicketDetails = async () => {
-      try {
-        const userId = localStorage.getItem('userId');
-
-        if (!userId) {
-          console.error('User id not found in local storage');
-          return;
-        }
-
-        const token = localStorage.getItem('authToken');
-
-        // Fetch connecting ticket details using the ConnectionFlightTicket API with authentication
-        const connectingTicketsResponse = await axios.get(
-          `http://192.168.10.71:98/api/ConnectionFlightTicket/GetConnectionFlightTicketsByUserId/${userId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const connectingTickets = connectingTicketsResponse.data;
-
-        // Fetch schedule details for each connecting ticket
-        const connectingTicketDetailsWithSchedule = await Promise.all(
-          connectingTickets.map(async (connectingTicket) => {
-            const bookingId = connectingTicket.bookingId;
-
-            const connectingTicketDetailsResponse = await axios.get(
-              `http://192.168.10.71:98/api/ConnectionFlightTicket/ByBooking/${bookingId}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
-
-            const connectingTicketDetails = connectingTicketDetailsResponse.data;
-
-            return { ...connectingTicket, schedule: connectingTicketDetails.schedule, type: 'connecting' };
-          })
-        );
-
-        const sortedConnectingTickets = connectingTicketDetailsWithSchedule.sort((a, b) => b.ticketNo - a.ticketNo);
-        setConnectingTicketDetails(sortedConnectingTickets);
-      } catch (error) {
-        toast.info('Session Expired Please Login again', error);
-      }
-    };
-
-    fetchTicketDetails();
-    fetchConnectingTicketDetails();
+    fetchSchedules();
   }, []);
 
-  // Group regular tickets by booking ID
-  const groupedTickets = ticketDetails.reduce((groups, ticket) => {
-    const bookingId = ticket.bookingId;
-    if (!groups[bookingId]) {
-      groups[bookingId] = [];
-    }
-    groups[bookingId].push(ticket);
-    return groups;
-  }, {});
-
-  // Group connecting tickets by booking ID
-  const groupedConnectingTickets = connectingTicketDetails.reduce((groups, connectingTicket) => {
-    const bookingId = connectingTicket.bookingId;
-    if (!groups[bookingId]) {
-      groups[bookingId] = [];
-    }
-    groups[bookingId].push(connectingTicket);
-    return groups;
-  }, {});
-
-  // Merge regular and connecting tickets for each booking ID
-  const mergedTickets = Object.keys(groupedTickets).map((bookingId) => {
-    const regularTickets = groupedTickets[bookingId] || [];
-    const connectingTickets = groupedConnectingTickets[bookingId] || [];
-    return [...regularTickets, ...connectingTickets];
-  });
-
-  // Sort merged tickets by ticket number
-  const sortedMergedTickets = mergedTickets.map((tickets) =>
-    tickets.sort((a, b) => b.ticketNo - a.ticketNo)
+  return (
+    <AdminLayout>
+      <div>
+        <h1>Schedule Flights</h1>
+        <Link to="/admin/Scheduling/addschedule" className="btn btn-success mb-3">
+          Schedule Flight
+        </Link>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Schedule ID</th>
+              <th>Flight Name</th>
+              <th>Source Airport</th>
+              <th>Destination Airport</th>
+              <th>Arrival Datetime</th>
+              <th>Departure Datetime</th>
+              <th>Duration</th>
+        
+              <th>Flight Status</th>
+              {/* <th>Seats Available</th> */}
+              {/* <th>Actions</th> */}
+            </tr>
+          </thead>
+          <tbody>
+            {schedules.map((schedule) => (
+              <tr key={schedule.scheduleId}>
+                <td>{schedule.scheduleId}</td>
+                <td>{schedule.flightName}</td>
+                <td>{schedule.sourceAirportName}</td>
+                <td>{schedule.destinationAirportName}</td>
+                <td>{schedule.dateTime}</td>
+                <td>{calculateDepartureDateTime(schedule)}</td>
+                <td>{schedule.flightDuration}</td>
+                <td>{schedule.isActive ? 'Active' : 'Inactive'}</td>
+                {/* <td>{calculateSeatsAvailable(schedule.seats)}</td> */}
+                {/* <td>
+                  <Link to={`/admin/Scheduling/editschedule/${schedule.scheduleId}`} className="btn btn-primary me-2">
+                    Update
+                  </Link>
+                  <button className="btn btn-danger" onClick={() => handleDelete(schedule.scheduleId)}>
+                    Delete
+                  </button>
+                </td> */}
+                
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </AdminLayout>
   );
+};
 
-  // Helper function to calculate destination time based on arrival time and flight duration
-  const calculateDestinationTime = (arrivalTime, flightDuration) => {
-    const arrivalDateTime = new Date(arrivalTime);
-    const durationParts = flightDuration.split(':');
-    const durationInSeconds = durationParts[0] * 3600 + durationParts[1] * 60 + durationParts[2] * 1;
-    const destinationDateTime = new Date(arrivalDateTime.getTime() + durationInSeconds * 1000);
-  
-    return destinationDateTime;
-  };
+// Function to calculate departure time based on arrival time and duration
+const calculateDepartureDateTime = (schedule) => {
+  const arrivalDateTime = new Date(schedule.dateTime);
+  const flightDuration = parseFlightDuration(schedule.flightDuration);
 
-  // Helper function to handle ticket cancellation
-  const cancelTicket = async (ticketNo, arrivalTime, type) => {
-    // ... (similar logic as in the Tickets component)
-  };
-  
-  // Helper function to handle booking cancellation
-  const cancelBooking = async (bookingId, departureTime, type) => {
-    // ... (similar logic as in the Tickets component)
-  };
+  if (!isNaN(flightDuration)) {
+    const durationInMillis = flightDuration * 1000; // Convert seconds to milliseconds
+    const departureDateTime = new Date(arrivalDateTime.getTime() + durationInMillis);
 
-  // Helper function to handle connecting ticket cancellation
-  const cancelConnectingTicket = async (ticketNo, arrivalTime, type) => {
-    // ... (similar logic as in the ConnectingTickets component)
-  };
-
-  // Helper function to format date and time
-  const formatDateTime = (dateTime) => {
+    // Format options
     const options = {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-      second: 'numeric',
-      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
     };
-  
-    return new Date(dateTime).toLocaleString('en-US', options);
-  };
 
-  return (
-    <Layout>
-      <div>
-        <h2>Combined Tickets</h2>
-        {sortedMergedTickets.map((tickets) => {
-          const bookingId = tickets[0].bookingId;
-  
-          return (
-            <div key={bookingId} className="card mb-3">
-              <div className="card-header">Booking ID: {bookingId}</div>
-              <div className="card-body">
-                <div className="row">
-                  {tickets.map((ticket) => (
-                    <div key={ticket.ticketNo} className="col-md-4 mb-3">
-                      <div className="card">
-                        <div className="card-body">
-                          <h5 className="card-title">Ticket No: {ticket.ticketNo}</h5>
-                          <p>Flight Name: {ticket.schedule?.flightName || 'N/A'}</p>
-                          <p>Source Airport: {ticket.schedule?.sourceAirportId || 'N/A'}</p>
-                          <p>Destination Airport: {ticket.schedule?.destinationAirportId || 'N/A'}</p>
-                          <p>Arrival Time: {formatDateTime(ticket.schedule?.dateTime) || 'N/A'}</p>
-                          <p>Seat No: {ticket.seatNo || 'N/A'}</p>
-                          <p>Name: {ticket.name || 'N/A'}</p>
-                          <p>Age: {ticket.age || 'N/A'}</p>
-                          <p>Gender: {ticket.gender || 'N/A'}</p>
-                          <button
-                            className="btn btn-danger"
-                            onClick={() => {
-                              if (ticket.type === 'regular') {
-                                cancelTicket(ticket.ticketNo, ticket.schedule?.dateTime, ticket.type);
-                              } else if (ticket.type === 'connecting') {
-                                cancelConnectingTicket(ticket.ticketNo, ticket.schedule?.dateTime, ticket.type);
-                              }
-                            }}
-                          >
-                            Cancel Ticket
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="card-footer">
-                <button
-                  className="btn btn-danger"
-                  onClick={() => {
-                    cancelBooking(bookingId, tickets[0].schedule?.dateTime, tickets[0].type);
-                  }}
-                >
-                  Cancel Booking
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </Layout>
-  );
-  
+    const formattedDepartureDateTime = departureDateTime.toLocaleString('en-GB', options); // Use 'en-GB' for dd/mm/yyyy format
+
+    return formattedDepartureDateTime;
+  }
+
+  return '';
 };
 
-export default Tickets;
+
+
+// Function to parse flight duration in seconds from hh:mm:ss format
+const parseFlightDuration = (duration) => {
+  const [hours, minutes, seconds] = duration.split(':').map(Number);
+  return hours * 3600 + minutes * 60 + seconds;
+};
+
+// Function to calculate the number of available seats
+const calculateSeatsAvailable = (seats) => {
+    const availableSeats = seats.filter((seat) => seat.status === 'Available');
+    const availableSeatNumbers = availableSeats.map((seat) => seat.seatNumber).join(', ');
+    return availableSeatNumbers;
+  };
+
+export default Schedule;

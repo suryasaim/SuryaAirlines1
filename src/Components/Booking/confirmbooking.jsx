@@ -112,7 +112,7 @@ const ConfirmBooking = () => {
       };
 
       const createBookingResponse = await axios.post(
-        'http://192.168.10.71:98/api/Booking/CreateBooking',
+        'http://192.168.10.70:98/api/Booking/CreateBooking',
         requestData,
         {
           headers,

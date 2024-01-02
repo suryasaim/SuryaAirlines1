@@ -22,7 +22,7 @@ const ConnectingTickets = () => {
         const token = localStorage.getItem('authToken');
 
         const connectingTicketsResponse = await axios.get(
-          `http://192.168.10.71:98/api/ConnectionFlightTicket/GetConnectionFlightTicketsByUserId/${userId}`,
+          `http://192.168.10.70:98/api/ConnectionFlightTicket/GetConnectionFlightTicketsByUserId/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -37,7 +37,7 @@ const ConnectingTickets = () => {
             const bookingId = connectingTicket.bookingId;
 
             const connectingTicketDetailsResponse = await axios.get(
-              `http://192.168.10.71:98/api/ConnectionFlightTicket/ByBooking/${bookingId}`,
+              `http://192.168.10.70:98/api/ConnectionFlightTicket/ByBooking/${bookingId}`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -93,7 +93,7 @@ const ConnectingTickets = () => {
       if (ticketArrivalDateTime > currentDateTime.getTime() + 24 * 60 * 60 * 1000) {
         const token = localStorage.getItem('authToken');
         const response = await axios.patch(
-          `http://192.168.10.71:98/api/Integration/cancelticketsinpartnerbooking/${bookingid}`,
+          `http://192.168.10.70:98/api/Integration/cancelticketsinpartnerbooking/${bookingid}`,
           null,
           {
             headers: {
@@ -122,7 +122,7 @@ const ConnectingTickets = () => {
       if (bookingDepartureDateTime > currentDateTime.getTime() + 24 * 60 * 60 * 1000) {
         const token = localStorage.getItem('authToken');
         const response = await axios.patch(
-          `http://192.168.10.71:98/api/Integration/cancelpartnerbooking/${bookingid}`,
+          `http://192.168.10.70:98/api/Integration/cancelpartnerbooking/${bookingid}`,
           null,
           {
             headers: {
@@ -164,13 +164,13 @@ const ConnectingTickets = () => {
           const connectingTickets = groupConnectingTickets()[bookingId];
 
           return (
-            <div key={bookingId} className="card mb-3">
+            <div key={bookingId} className="card mb-3"style={{  borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'}}>
               <div className="card-header">Booking ID: {bookingId}</div>
               <div className="card-body">
                 <div className="row">
                   {connectingTickets.map((connectingTicket, index) => (
                     <div key={connectingTicket.ticketNo} className={`col-md-4 mb-3`}>
-                      <div className="card">
+                      <div className="card"style={{  borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'}}>
                         <div className="card-body">
                           <h5 className="card-title">Ticket No: {connectingTicket.ticketNo}</h5>
                           <p>Flight Name: {connectingTicket.flightName || 'N/A'}</p>

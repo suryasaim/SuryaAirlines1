@@ -32,7 +32,7 @@ function AddAirport() {
       };
 
       // Make the API request with authentication headers
-      await axios.post('http://192.168.10.71:98/api/Airport', airport, { headers });
+      await axios.post('http://192.168.10.70:98/api/Airport', airport, { headers });
 
       // After successful submission, clear the form fields
       setAirport({
@@ -69,6 +69,7 @@ function AddAirport() {
     <AdminLayout>
       <div className="container mt-5" style={{ width: '30vw', height: '100vh' }}>
         <h2>Add Airport</h2>
+        <div className="container mt-4 p-3 bg-white" style={{ borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'}} >
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="airportId" className="form-label">
@@ -134,6 +135,7 @@ function AddAirport() {
         <Link to="/admin/Airports/Airport" className="btn btn-warning mt-3">
           View Airports
         </Link>
+        </div>
       </div>
     </AdminLayout>
   );

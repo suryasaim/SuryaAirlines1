@@ -17,6 +17,7 @@ function AdminNavBar() {
     localStorage.removeItem('roles');
     localStorage.removeItem('id');
     localStorage.removeItem('token');
+    localStorage.removeItem('email');
 
 
   };

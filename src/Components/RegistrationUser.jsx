@@ -24,7 +24,7 @@ function Registrationuser() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        'http://192.168.10.71:98/api/Authorization/RegistrationUser',
+        'http://192.168.10.70:98/api/Authorization/RegistrationUser',
         formData
       );
       toast.success('Registered successfully');
@@ -43,12 +43,15 @@ function Registrationuser() {
       Password: '',
     });
   };
-
+ 
   return (
-    <div style={{ height: '50vh', width: '35vw', margin: 'auto' }}>
-      <div className="container mt-5">
+
+<div className="d-flex justify-content-center align-items-center">   
+  <div className="flex justify-center items-center border bg-white p-3 bold  rounded hover:cursor-pointer m-3"style={{  width: '45vw',boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)' }}>
+    <div >
+      <div className="container mt-2">
         <h2 className="text-center">Surya Airlines</h2>
-        <h3 className="text-center">User Registration Form</h3>
+        <h4 className="text-center">User Registration Form</h4>
         <form onSubmit={handleRegistration}>
           <div className="mb-3">
             <input
@@ -90,17 +93,26 @@ function Registrationuser() {
               onChange={handleInputChange}
             />
           </div>
-          <button type="submit" className="btn btn-primary btn-block">
-            Register
-          </button>
-          <div className="text-center mb-4 mt-3">
-            <Link to="/login" className="btn btn-danger mx-2">
-              Login
-            </Link>
+          <div className="d-flex flex-column align-items-row">
+            <button type="submit" className="btn btn-primary btn-block mb-3">
+             Register
+            </button>
+            <div className="d-flex">
+              <span className="text-center">Already have an account? </span>
+              <Link to="/login" className="btn btn-danger mx-2">
+                Login
+              </Link>
+              <Link to="/dashboard" className="btn btn-warning mr-3"style={{ marginLeft: '20px' }}>
+              Continue Without Login
+              </Link>
+            </div>
           </div>
+
         </form>
       </div>
     </div>
+  </div>  
+ </div> 
   );
 }
 

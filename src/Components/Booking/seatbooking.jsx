@@ -49,7 +49,7 @@ const SeatSelection = () => {
         // Set the numberOfPassengers in the component state
         setNumberOfPassengers(parseInt(storedNumberOfPassengers, 10) || 1);
 
-        const response = await fetch(`http://192.168.10.71:98/api/Seats/BySchedule/${bookingInfo.scheduleId}`, {
+        const response = await fetch(`http://192.168.10.70:98/api/Seats/BySchedule/${bookingInfo.scheduleId}`, {
           headers: {
             Authorization: `Bearer ${token}`, // Include the JWT token in the headers
           },

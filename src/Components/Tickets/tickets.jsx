@@ -22,7 +22,7 @@ const Tickets = () => {
         const token = localStorage.getItem('authToken');
 
         // Fetch ticket details using the FlightTicket API with authentication
-        const response = await axios.get(`http://192.168.10.71:98/api/FlightTicket/flighttickets/${userId}`, {
+        const response = await axios.get(`http://192.168.10.70:98/api/FlightTicket/flighttickets/${userId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -33,7 +33,7 @@ const Tickets = () => {
         // Fetch schedule details for each ticket
         const ticketDetailsWithSchedule = await Promise.all(
           tickets.map(async (ticket) => {
-            const scheduleResponse = await axios.get(`http://192.168.10.71:98/api/Schedule/GetSchedules/${ticket.scheduleId}`, {
+            const scheduleResponse = await axios.get(`http://192.168.10.70:98/api/Schedule/GetSchedules/${ticket.scheduleId}`, {
               headers: {
                 'Authorization': `Bearer ${token}`,
               },
@@ -84,7 +84,7 @@ const Tickets = () => {
         // Implement cancellation logic here
         const token = localStorage.getItem('authToken');
         const response = await axios.patch(
-          `http://192.168.10.71:98/api/FlightTicket/DeleteTicket/${ticketNo}`,
+          `http://192.168.10.70:98/api/FlightTicket/DeleteTicket/${ticketNo}`,
           null,  // You can send data if needed
           {
             headers: {
@@ -120,7 +120,7 @@ const Tickets = () => {
         // Implement booking cancellation logic here
         const token = localStorage.getItem('authToken');
         const response = await axios.patch(
-          `http://192.168.10.71:98/api/Booking/DeleteBooking/${bookingId}`,
+          `http://192.168.10.70:98/api/Booking/DeleteBooking/${bookingId}`,
           null,  // You can send data if needed
           {
             headers: {
@@ -175,13 +175,13 @@ const sortedBookingIds = Object.keys(groupedTickets).sort(
           const arrivalDateTime = calculateDestinationTime(departureDateTime, tickets[0].schedule.flightDuration);
 
           return (
-            <div key={bookingId} className="card mb-3">
+            <div key={bookingId} className="card mb-3"style={{  borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'}}>
               <div className="card-header">Booking ID: {bookingId}</div>
               <div className="card-body">
                 <div className="row">
                   {tickets.map((ticket) => (
                     <div key={ticket.ticketNo} className="col-md-4 mb-3">
-                      <div className="card">
+                      <div className="card"style={{  borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'}}>
                         <div className="card-body">
                           <h5 className="card-title">Ticket No: {ticket.ticketNo}</h5>
                           <p>Flight Name: {ticket.schedule.flightName}</p>

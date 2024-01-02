@@ -49,12 +49,12 @@ const ConnectSeatBooking = () => {
 
         // Make API requests with JWT authentication
         const [firstResponse, secondResponse] = await Promise.all([
-          axios.get(`http://192.168.10.71:98/api/Seats/BySchedule/${bookingInfo.scheduleIds[0]}`, {
+          axios.get(`http://192.168.10.70:98/api/Seats/BySchedule/${bookingInfo.scheduleIds[0]}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }),
-          axios.get(`http://192.168.10.71:98/api/Seats/BySchedule/${bookingInfo.scheduleIds[1]}`, {
+          axios.get(`http://192.168.10.70:98/api/Seats/BySchedule/${bookingInfo.scheduleIds[1]}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },

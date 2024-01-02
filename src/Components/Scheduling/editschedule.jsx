@@ -26,7 +26,7 @@ const UpdateSchedule = () => {
         const token = localStorage.getItem('authToken');
         const headers = { Authorization: `Bearer ${token}` };
 
-        const response = await axios.get(`http://192.168.10.71:98/api/Schedule/GetSchedules/${id}`, { headers });
+        const response = await axios.get(`http://192.168.10.70:98/api/Schedule/GetSchedules/${id}`, { headers });
         const fetchedSchedule = response.data[0];
 
         if (fetchedSchedule && fetchedSchedule.flightName) {
@@ -72,7 +72,7 @@ const UpdateSchedule = () => {
         'Content-Type': 'application/json', // Set the Content-Type header
       };
 
-      await axios.patch(`http://192.168.10.71:98/api/Schedule/UpdateSchedule/${id}`, {
+      await axios.patch(`http://192.168.10.70:98/api/Schedule/UpdateSchedule/${id}`, {
         ...schedule,
         departureDateTime,
       }, { headers });

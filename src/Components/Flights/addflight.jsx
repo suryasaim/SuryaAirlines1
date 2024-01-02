@@ -29,7 +29,7 @@ function AddFlight() {
         'Content-Type': 'application/json', // Set the Content-Type header
       };
   
-      await axios.post('http://192.168.10.71:98/api/Flight/Flightdetails', flight, { headers });
+      await axios.post('http://192.168.10.70:98/api/Flight/Flightdetails', flight, { headers });
       toast.success('Flight added successfully');
       // After successful submission, clear the form fields
       setFlight({
@@ -61,7 +61,8 @@ function AddFlight() {
   return (
     <AdminLayout>
       <div className="container mt-5" style={{ width: '40vw', height: '100vh' }}>
-        <h2>Add Flight</h2>
+        <h3>Add Flight</h3>
+       <div className="container mt-4 p-3 bg-white" style={{ borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'}} >
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="flightCapacity" className="form-label">
@@ -98,6 +99,7 @@ function AddFlight() {
         <Link to="/admin/flights/flights" className="btn btn-warning mt-3">
           View Flights
         </Link>
+       </div> 
       </div>
     </AdminLayout>
   );

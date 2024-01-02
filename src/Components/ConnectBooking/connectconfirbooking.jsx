@@ -178,7 +178,7 @@ const ConnectConfirmBooking = () => {
 
       // Use Axios to make the POST request for the first schedule
       const createBookingResponseFirstSchedule = await axios.post(
-        'http://192.168.10.71:98/api/Booking/CreateBooking',
+        'http://192.168.10.70:98/api/Booking/CreateBooking',
         requestDataFirstSchedule,
         {
           headers: {
@@ -216,7 +216,7 @@ const ConnectConfirmBooking = () => {
 
       // Use Axios to make the POST request for the second schedule
       const createBookingResponseSecondSchedule = await axios.post(
-        'http://192.168.10.71:98/api/Booking/CreateBooking',
+        'http://192.168.10.70:98/api/Booking/CreateBooking',
         requestDataSecondSchedule,
         {
           headers: {

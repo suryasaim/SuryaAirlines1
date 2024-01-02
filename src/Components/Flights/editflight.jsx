@@ -19,7 +19,7 @@ function EditFlight() {
         const token = 'YOUR_JWT_TOKEN'; // Replace with the actual token
         const headers = { Authorization: `Bearer ${token}` };
 
-        const response = await axios.get(`http://192.168.10.71:98/api/Flight/${id}`, { headers });
+        const response = await axios.get(`http://192.168.10.70:98/api/Flight/${id}`, { headers });
         setFlight(response.data);
       } catch (error) {
         handleRequestError(error, 'Error fetching flight');
@@ -52,7 +52,7 @@ function EditFlight() {
         'Content-Type': 'application/json', // Set the Content-Type header
       };
   
-      await axios.patch(`http://192.168.10.71:98/api/Flight/${id}`, flight, { headers });
+      await axios.patch(`http://192.168.10.70:98/api/Flight/${id}`, flight, { headers });
       toast.success('Flight updated successfully');
       //navigate('/admin/Flights/Flights'); // Redirect to Flights page
     } catch (error) {

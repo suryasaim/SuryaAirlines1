@@ -21,7 +21,7 @@ function EditAirport() {
         const token = localStorage.getItem('authToken');
         const headers = { Authorization: `Bearer ${token}` };
 
-        const response = await axios.get(`http://192.168.10.71:98/api/Airport/${id}`, { headers });
+        const response = await axios.get(`http://192.168.10.70:98/api/Airport/${id}`, { headers });
         setAirport(response.data);
       } catch (error) {
         handleRequestError(error, 'Error fetching airport');
@@ -49,7 +49,7 @@ function EditAirport() {
         'Content-Type': 'application/json', // Set the Content-Type header
       };
   
-      await axios.patch(`http://192.168.10.71:98/api/Airport/${id}`, airport, { headers });
+      await axios.patch(`http://192.168.10.70:98/api/Airport/${id}`, airport, { headers });
       toast.success('Airport updated successfully');
       // Redirect to the Airports page or perform any other necessary actions
     } catch (error) {
@@ -68,6 +68,7 @@ function EditAirport() {
     <AdminLayout>
       <div className="container mt-5" style={{ width: '30vw', height: '100vh' }}>
         <h2>Edit Airport</h2>
+        <div className="container mt-4 p-3 bg-white" style={{ borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'}} >
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="airportId" className="form-label">
@@ -133,6 +134,7 @@ function EditAirport() {
         <Link to="/admin/Airports/Airport" className="btn btn-warning mt-3">
           Back to Airports
         </Link>
+        </div>
       </div>
     </AdminLayout>
   );

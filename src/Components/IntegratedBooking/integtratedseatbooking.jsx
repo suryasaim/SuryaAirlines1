@@ -49,7 +49,7 @@ const IntegratedSeatBooking = () => {
         const token = localStorage.getItem('authToken');
   
         // Fetch seats for the first schedule
-        const firstResponse = await fetch(`http://192.168.10.71:98/api/Seats/BySchedule/${integratedBookingInfo.scheduleIds[0]}`, {
+        const firstResponse = await fetch(`http://192.168.10.70:98/api/Seats/BySchedule/${integratedBookingInfo.scheduleIds[0]}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -77,7 +77,7 @@ const IntegratedSeatBooking = () => {
         }
   
         // Fetch seats for the second schedule
-        const secondResponse = await fetch(`http://192.168.10.71:98/api/Seats/BySchedule/${integratedBookingInfo.scheduleIds[1]}`, {
+        const secondResponse = await fetch(`http://192.168.10.70:98/api/Seats/BySchedule/${integratedBookingInfo.scheduleIds[1]}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

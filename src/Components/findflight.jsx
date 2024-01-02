@@ -21,10 +21,16 @@ function FindFlights() {
   const [sourceAirportId, setSourceAirportId] = useState('');
   const [destinationAirportId, setDestinationAirportId] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [returnDate, setReturnDate] = useState(new Date());// New state for return date
   const [availableFlights, setAvailableFlights] = useState([]);
   const [connectedFlights, setConnectedFlights] = useState([]);
   const [bookingInfo, setBookingInfo] = useState(null);
   const [bookingType, setBookingType] = useState('One Way');
+  const [showReturnDateSelection, setShowReturnDateSelection] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [flightsNotFound, setFlightsNotFound] = useState(false);
+  const [timeoutId, setTimeoutId] = useState(null);
+  
 
 
 
@@ -34,7 +40,7 @@ function FindFlights() {
   useEffect(() => {
     async function fetchCityNames() {
       try {
-        const response = await axios.get('http://192.168.10.71:98/api/Airport');
+        const response = await axios.get('http://192.168.10.70:98/api/Airport');
         const airports = response.data;
         setCityNames(airports);
       } catch (error) {
@@ -48,7 +54,8 @@ function FindFlights() {
   const handleSearch = async () => {
     try {
 
-      
+      setLoading(true); 
+      setFlightsNotFound(false)
 
       if (!sourceAirportId || !destinationAirportId) {
         toast.error('Invalid source or destination airport. Please try again.');
@@ -56,12 +63,28 @@ function FindFlights() {
       }
       
       const formattedDate = selectedDate.toISOString().split('T')[0];
-      localStorage.setItem('flightSearchParameters', JSON.stringify({
-        sourceAirportId,
-        destinationAirportId,
-        selectedDate: formattedDate,
-        bookingType,
-      }));
+      if (bookingType === 'Round Trip') {
+        localStorage.setItem(
+          'flightSearchParameters',
+          JSON.stringify({
+            sourceAirportId,
+            destinationAirportId,
+            selectedDate: formattedDate,
+            returnDate: returnDate.toISOString().split('T')[0], // Add return date to the stored parameters
+            bookingType,
+          })
+        );
+      } else {
+        localStorage.setItem(
+          'flightSearchParameters',
+          JSON.stringify({
+            sourceAirportId,
+            destinationAirportId,
+            selectedDate: formattedDate,
+            bookingType,
+          })
+        );
+      }
       console.log(sourceAirportId);
       console.log(destinationAirportId);
       console.log(formattedDate);
@@ -71,7 +94,7 @@ function FindFlights() {
   
       // Search for direct flights
       try {
-        const directResponse = await axios.get(`http://192.168.10.71:98/api/Integration/directflight/${sourceAirportId}/${destinationAirportId}/${formattedDate}`);
+        const directResponse = await axios.get(`http://192.168.10.70:98/api/Integration/directflight/${sourceAirportId}/${destinationAirportId}/${formattedDate}`);
         directFlightResponse = directResponse.data;
         console.log(directFlightResponse);
       } catch (directError) {
@@ -81,7 +104,7 @@ function FindFlights() {
   
       // Search for connecting flights
       try {
-        const connectingResponse = await axios.get(`http://192.168.10.71:98/api/Integration/connectingflight/${sourceAirportId}/${destinationAirportId}/${formattedDate}`);
+        const connectingResponse = await axios.get(`http://192.168.10.70:98/api/Integration/connectingflight/${sourceAirportId}/${destinationAirportId}/${formattedDate}`);
         connectingFlightResponse = connectingResponse.data;
         console.log(connectingFlightResponse);
       } catch (connectingError) {
@@ -110,7 +133,7 @@ function FindFlights() {
           try {
             
             const secondFlightResponse = await axios.get(
-              `http://192.168.10.71:98/api/Integration/directflight/${firstFlightDestinationId}/${destinationAirportId}/${firstFlightDate}`
+              `http://192.168.10.70:98/api/Integration/directflight/${firstFlightDestinationId}/${destinationAirportId}/${firstFlightDate}`
             );
             console.log(secondFlightResponse)
             if (secondFlightResponse.data.length > 0) {
@@ -127,6 +150,13 @@ function FindFlights() {
         }
         console.log(integratedConnectingFlights)
         setConnectedFlights(integratedConnectingFlights);
+        setLoading(false);
+        if (finalIntegratedConnectingFlights.length === 0) {
+          // Set flightsNotFound to true after a timeout (e.g., 2 minutes)
+          setTimeout(() => {
+            setFlightsNotFound(true);
+          }, 120000);
+        }
       } else {
         toast.info('No connecting flights found for the selected route and date.');
         setConnectedFlights([]);
@@ -134,8 +164,13 @@ function FindFlights() {
     } catch (error) {
       console.error('Error during flight search:', error);
       toast.error('Error during flight search');
+      setLoading(false); 
     }
       
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      setTimeoutId(null);
+    }
     const formattedDate = selectedDate.toISOString().split('T')[0];
     console.log(SuryaairlineUrl);
     console.log(airlinesapi);
@@ -384,6 +419,29 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
            />
           </div>
         </div>
+        {/* <div className="col-md-3">
+         <div className="form-group">
+           <label htmlFor="returnDate">Return Date:</label>
+           {bookingType === 'Round Trip' && (
+             <DatePicker
+               id="returnDate"
+               selected={returnDate}
+               onChange={(date) => setReturnDate(date)}
+               dateFormat="MMMM d, yyyy"
+               minDate={new Date(new Date().getTime() + 24 * 60 * 60 * 1000)} // Set minDate to tomorrow
+               className="form-control"
+            />
+          )}
+          <button
+           onClick={() => setShowReturnDateSelection(!showReturnDateSelection)}
+           className="btn btn-secondary mt-2"
+          >
+           Toggle Return Date
+          </button>
+        </div>
+      </div> */}
+
+      {/* <div className="col-md-3"></div>
         <div className="col-md-3">
           <div className="form-group">
            <label htmlFor="bookingType">Booking Type:</label>
@@ -397,13 +455,30 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
              <option value="Round Trip">Round Trip</option>
            </select>
           </div>
-        </div>
+        </div> */}
 
         <div className="col-m3  m-2">
           <button onClick={handleSearch} className="btn btn-primary">
-            Search Flights
+            {loading ? 'Searching...' : 'Search Flights'}
+            
           </button>
         </div>
+        {/* Display loading spinner */}
+        {loading && (
+           <div className="text-center mt-3">
+             <div className="spinner-border" role="status">
+               <span className="visually-hidden">Loading...</span>
+             </div>
+           </div>
+        )}
+
+        {/* Display "Could not find flights" message */}
+        {flightsNotFound && (
+          <div className="text-center mt-3">
+          <p className="text-danger">Could not find integrated connecting flights.</p>
+        </div>
+      )}
+
       </div>
     </div>  
       {availableFlights.length > 0 && (

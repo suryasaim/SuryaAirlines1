@@ -64,7 +64,7 @@ function Flights() {
         <Link to="/admin/Flights/addflight" className="btn btn-success mb-3">
           Add Flight
         </Link>
-        <table className="table">
+        <table className="table" style={{  borderRadius: '10px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'}} >
           <thead>
             <tr>
               <th>Flight Name</th>

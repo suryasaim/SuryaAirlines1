@@ -118,7 +118,7 @@ const ScheduleFlights = () => {
         };
   
         // Include flightDuration in the API request
-        await axios.post('http://192.168.10.71:98/api/Schedule/CreateSchedule', requestData, { headers });
+        await axios.post('http://192.168.10.70:98/api/Schedule/CreateSchedule', requestData, { headers });
       }
   
       toast.success('Flights scheduled successfully');
