@@ -126,8 +126,17 @@ const IntegratedSeatBooking = () => {
         ? availableSeats.firstFlightSeats.some((seat) => seat.seatNumber === seatNumber)
         : availableSeats.secondFlightSeats.some((seat) => seat.seatNumber === seatNumber);
 
+    // Check if the seat is already booked
+    const isSeatBooked =
+      schedule === 1
+        ? availableSeats.firstFlightSeats.find((seat) => seat.seatNumber === seatNumber)?.status === 'Booked'
+        : availableSeats.secondFlightSeats.find((seat) => seat.seatNumber === seatNumber)?.status === 'Booked';
+
     if (isScheduleSeat) {
-      if (isSeatSelected) {
+      if (isSeatBooked) {
+        // Display a toast message indicating that the seat is already booked
+        toast.warning('This seat is already booked. Please choose another seat.');
+      } else if (isSeatSelected) {
         setSelectedSeats((prevSelectedSeats) => prevSelectedSeats.filter((seat) => seat !== seatNumber));
       } else if (selectedSeats.length < numberOfPassengers) {
         setSelectedSeats((prevSelectedSeats) => [...prevSelectedSeats, seatNumber]);
@@ -196,13 +205,14 @@ const IntegratedSeatBooking = () => {
   };
 
   const getSeatVariant = (seat, selectedSeats) => {
-    return selectedSeats.includes(seat.seatNumber) ? 'primary' : seat.status === 'Booked' ? 'danger' : 'success';
+    return selectedSeats.includes(seat.seatNumber) ? 'primary' : seat.status === 'Booked' ? 'danger' : 'outline-success';
   };
 
   return (
     <Layout>
-      <Container style={{ width: '60vw',background: 'rgba(255, 255, 255, 0.8)', }}>
+      <Container className="container p-3" style={{ width: '60vw',background: 'rgba(255, 255, 255, 0.8)',borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)' }}>
         <h2 className="mt-4 mb-4">Select Your Seats</h2>
+        <div className="container mt-1" style={{ borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'}} >
         <h3 className="mt-4 mb-4">First Flight Seats</h3>
         <Row xs={2} md={3} lg={6} className="mb-4">
           {availableSeats.firstFlightSeats.map((seat) => (
@@ -219,6 +229,8 @@ const IntegratedSeatBooking = () => {
             </Col>
           ))}
         </Row>
+        </div>
+        <div className="container mt-1" style={{ borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'}} >
         <h3 className="mt-4 mb-4">Second Flight Seats</h3>
         <Row xs={2} md={3} lg={6} className="mb-4">
           {availableSeats.secondFlightSeats.map((seat) => (
@@ -235,6 +247,7 @@ const IntegratedSeatBooking = () => {
             </Col>
           ))}
         </Row>
+        </div>
         <div className="d-flex justify-content-between mb-2">
           <Button variant="danger" onClick={handleBack}>
             Back

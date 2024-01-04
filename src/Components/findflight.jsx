@@ -30,6 +30,10 @@ function FindFlights() {
   const [loading, setLoading] = useState(false);
   const [flightsNotFound, setFlightsNotFound] = useState(false);
   const [timeoutId, setTimeoutId] = useState(null);
+  const [loadingIntegratedFlights, setLoadingIntegratedFlights] = useState(false);
+  const [integratedFlightsNotFound, setIntegratedFlightsNotFound] = useState(false);
+
+
   
 
 
@@ -55,7 +59,7 @@ function FindFlights() {
     try {
 
       setLoading(true); 
-      setFlightsNotFound(false)
+      setFlightsNotFound(false);
 
       if (!sourceAirportId || !destinationAirportId) {
         toast.error('Invalid source or destination airport. Please try again.');
@@ -152,9 +156,11 @@ function FindFlights() {
         setConnectedFlights(integratedConnectingFlights);
         setLoading(false);
         if (finalIntegratedConnectingFlights.length === 0) {
-          // Set flightsNotFound to true after a timeout (e.g., 2 minutes)
+          setLoadingIntegratedFlights(true); // Set loading to true before fetching integrated connecting flights
+
           setTimeout(() => {
             setFlightsNotFound(true);
+            setLoadingIntegratedFlights(false); // Set loading to false after the timeout
           }, 120000);
         }
       } else {
@@ -164,7 +170,7 @@ function FindFlights() {
     } catch (error) {
       console.error('Error during flight search:', error);
       toast.error('Error during flight search');
-      setLoading(false); 
+      setLoading(false);
     }
       
     if (timeoutId) {
@@ -270,8 +276,17 @@ const calculateArrivalTime = (departureDateTime, duration) => {
   const departureTime = new Date(departureDateTime).getTime();
   const durationMilliseconds = durationToMilliseconds(duration);
   const arrivalTime = new Date(departureTime + durationMilliseconds);
-  return arrivalTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  const options = {
+    hour: '2-digit',
+    minute: '2-digit',
+    second:'2-digit',
+    hour12: false, // Set to false for 24-hour format
+  };
+
+  return arrivalTime.toLocaleTimeString('en-US', options);
 };
+
 
 
 const calculateArrivalDate = (departureDateTime, duration) => {
@@ -466,7 +481,7 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
         {/* Display loading spinner */}
         {loading && (
            <div className="text-center mt-3">
-             <div className="spinner-border" role="status">
+             <div className="spinner-border text-primary" role="status">
                <span className="visually-hidden">Loading...</span>
              </div>
            </div>
@@ -475,7 +490,7 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
         {/* Display "Could not find flights" message */}
         {flightsNotFound && (
           <div className="text-center mt-3">
-          <p className="text-danger">Could not find integrated connecting flights.</p>
+          <p className="text-danger">Could not find more integrated connecting flights.</p>
         </div>
       )}
 
@@ -531,7 +546,9 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
 
 {connectedFlights.length > 0 && (
   <div className="container mt-3" style={{ width: '60vw', }}>
+    <div className=" bg-white p-2 bold  rounded hover:cursor-pointer m-5"style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)' }}>
     <h3 className="mb-2">Connecting Flights</h3>
+    </div>
     <div className="row">
       {connectedFlights.map((connectingFlights, index) => (
         <div key={index} className="col-md-12 mb-3">
@@ -630,10 +647,27 @@ const handleBookNowIntegratedConnecting = (firstflightScheduleId, secondflightSc
 
 <div className="container mt-4 " style={{ width: '70vw', }}>
   <div className="m-0">
-    
+    {/* Display loading spinner for integrated connecting flights */}
+    {loadingIntegratedFlights && (
+        <div className="text-center mt-3">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading Integrated Flights...</span>
+          </div>
+          <p>Loading Integrated Flights...</p>
+        </div>
+      )}
+
+      {/* Display "Could not find integrated connecting flights" message */}
+      {integratedFlightsNotFound && (
+        <div className="text-center mt-3">
+          <p className="text-danger">Could not find integrated connecting flights.</p>
+        </div>
+      )}
     {finalIntegratedConnectingFlights.map((connection, index) => (
       <div key={index} className="flex justify-between">
+        <div className=" bg-white p-2 bold  rounded hover:cursor-pointer m-5"style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)' }}>
         <h3>Integrated Connecting Flights</h3>
+        </div>
         <div className="flex border bg-white p-3 bold  rounded hover:cursor-pointer m-5"style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)' }}>
           <div className="p-2" style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)' }}>
                 <div className="mt-0" style={{ color: 'blue', fontWeight: 'bold' }}>

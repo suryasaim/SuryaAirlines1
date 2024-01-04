@@ -163,8 +163,9 @@ const SeatSelection = () => {
 
   return (
     <Layout>
-      <Container  style={{ width: '60vw',background: 'rgba(255, 255, 255, 0.8)', }}>
+      <Container className="container p-3" style={{ width: '60vw',background: 'rgba(255, 255, 255, 0.8)',borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)' }}>
         <h2 className="mt-4 mb-4">Seat Your Seats</h2>
+        <div className="container mt-1" style={{ borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'}} >
         <Row xs={2} md={3} lg={6} className="mb-4">
           {availableSeats.map((seat) => (
             <Col key={seat.seatNumber}>
@@ -180,6 +181,7 @@ const SeatSelection = () => {
             </Col>
           ))}
         </Row >
+        </div>
         <div className="d-flex justify-content-between mb-2"> 
           <Button variant="danger" onClick={handleBack}>
             Back

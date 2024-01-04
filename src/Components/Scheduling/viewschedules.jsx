@@ -6,10 +6,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import AdminLayout from '../adminlayout';
 import ReactPaginate from 'react-paginate';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Spinner } from 'react-bootstrap';
+
 
 const Schedule = () => {
   const [schedules, setSchedules] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
+  const [loading, setLoading] = useState(true); 
   const perPage = 20;
 
   useEffect(() => {
@@ -41,8 +44,12 @@ const Schedule = () => {
         ]);
 
         setSchedules(schedulesWithAirports);
+        setLoading(false);
       } catch (error) {
+        
         console.error('Error fetching schedules:', error);
+        setLoading(false); 
+        toast.error('Error fetching schedules');
       }
     }
 
@@ -66,6 +73,9 @@ const Schedule = () => {
         <Link to="/admin/Scheduling/addschedule" className="btn btn-success mb-3">
           Schedule Flight
         </Link>
+        {/* Display loading spinner */}
+        
+
         <table className="table"style={{  borderRadius: '10px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'}} >
           <thead>
             <tr>
@@ -94,6 +104,13 @@ const Schedule = () => {
             ))}
           </tbody>
         </table>
+        {loading && (
+          <div className="text-center mt-3">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        )}
         <div className="container mt-4  bg-white" style={{ width: '38vw', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'}}>
         <ReactPaginate
           previousLabel={'Previous'}

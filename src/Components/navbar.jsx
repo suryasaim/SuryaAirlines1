@@ -18,6 +18,10 @@ function NavBar() {
     localStorage.removeItem('email');
 
   };
+  const handleSweetSixteenClick = () => {
+    // Redirect to the specified link
+    window.location.href = 'http://192.168.10.94:90/';
+  };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light fixed-top" style={{ backgroundColor: '#9ACD32' }}>
@@ -39,15 +43,21 @@ function NavBar() {
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto"> {/* Use ms-auto to align to the right */}
             <li className="nav-item">
+              {/* Use inline styles for the "Sweet Sixteen" link */}
+              <span
+                className="nav-link"
+                onClick={handleSweetSixteenClick}
+                style={{ color: '#ffffff', fontWeight: 'bold' }}
+              >
+                Sweet Sixteen
+              </span>
+            </li>
+            <li className="nav-item">
               <Link to="/dashboard" className="nav-link">
                 Home
               </Link>
             </li>
-            {/* <li className="nav-item">
-              <Link to="/dashboard/Brandprice/Modelprice" className="nav-link">
-                About
-              </Link>
-            </li> */}
+            
             <li className="nav-item">
               <Link to="/dashboard/Tickets/tickets" className="nav-link">
                 Bookings

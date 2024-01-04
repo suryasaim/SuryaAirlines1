@@ -14,7 +14,7 @@ function Flights() {
         const token = localStorage.getItem('authToken');
         const headers = { Authorization: `Bearer ${token}` };
 
-        const response = await axios.get('http://192.168.10.71:98/api/Flight/GetFlightdetails', { headers });
+        const response = await axios.get('http://192.168.10.70:98/api/Flight/GetFlightdetails', { headers });
         setFlights(response.data);
       } catch (error) {
         handleRequestError(error, 'Error fetching flights');
@@ -29,7 +29,7 @@ function Flights() {
       const token = localStorage.getItem('authToken');
       const headers = { Authorization: `Bearer ${token}` };
 
-      await axios.delete(`http://192.168.10.71:98/api/Flight/${flightId}`, { headers });
+      await axios.delete(`http://192.168.10.70:98/api/Flight/${flightId}`, { headers });
 
       const updatedFlights = flights.filter((flight) => flight.flightId !== flightId);
       setFlights(updatedFlights);
@@ -70,7 +70,7 @@ function Flights() {
               <th>Flight Name</th>
               <th>Flight Capacity</th>
               <th>Is Active</th>
-              <th>Actions</th>
+              {/* <th>Actions</th> */}
             </tr>
           </thead>
           <tbody>
@@ -79,14 +79,14 @@ function Flights() {
                 <td>{flight.flightName}</td>
                 <td>{flight.flightCapacity}</td>
                 <td>{flight.isActive ? 'Active' : 'Inactive'}</td>
-                <td>
+                {/* <td>
                   <Link to={`/admin/flights/editflight/${flight.flightId}`} className="btn btn-primary me-2">
                     Update
                   </Link>
                   <button className="btn btn-danger" onClick={() => handleDelete(flight.flightId)}>
                     Delete
                   </button>
-                </td>
+                </td> */}
               </tr>
             ))}
           </tbody>

@@ -13,19 +13,19 @@ export const airlinesapi = {
     },
     dhanuairline: {
       name: 'Dhanu Airline',
-      apiPath: 'http://192.168.10.64:8080/api/',
+      apiPath: 'http://192.168.10.75:8080/api/',
     },
     chetnaairline: {
       name: 'Chetna Airline',
-      apiPath: 'http://192.168.10.67:96/api/',
+      apiPath: 'http://192.168.10.59:96/api/',
     },
     abhiramairline: {
       name: 'Abhiram Airline',
-      apiPath: 'http://192.168.10.69:83/api/',
+      apiPath: 'http://192.168.10.94:83/api/',
     },
     lasyaairline: {
       name: 'Lasya Airline',
-      apiPath: 'http://192.168.10.66:97/api/',
+      apiPath: 'http://192.168.10.69:97/api/',
     },
     hariniairline: {
         name: 'Harini Airline',
@@ -33,11 +33,11 @@ export const airlinesapi = {
     },
     mahaairline: {
         name: 'Maha Airline',
-        apiPath: 'http://192.168.10.62:91/api/',
+        apiPath: 'http://192.168.10.63:91/api/',
     },
     rethuairline: {
         name: 'Rethu Airline',
-        apiPath: 'http://192.168.10.83:94/api/',
+        apiPath: 'http://192.168.10.74:94/api/',
     },
     sundariairline: {
         name: 'Sundari Airline',
@@ -49,7 +49,7 @@ export const airlinesapi = {
     },
     thillaiirline: {
       name: 'Thillai Airline',
-      apiPath: 'http://192.168.10.77:86/api/',
+      apiPath: 'http://192.168.10.88:86/api/',
     },
     vishalairline: {
       name: 'Vishal Airline',
@@ -57,7 +57,7 @@ export const airlinesapi = {
     },
     akshayairline: {
       name: 'Akshya Airline',
-      apiPath: 'http://192.168.10.61:92/api/',
+      apiPath: 'http://192.168.10.82:92/api/',
     },
     
   };

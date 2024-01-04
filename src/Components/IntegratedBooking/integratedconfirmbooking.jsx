@@ -275,7 +275,7 @@ const IntegratedConfirmBooking = () => {
 
     sessionStorage.setItem('savedDataSecondIntegratedSchedule', JSON.stringify(savedDataSecondIntegratedSchedule));
      //console.log(savedDataSecondIntegratedSchedule)
-      toast.success('Data saved successfully for both schedules in the desired format!');
+      toast.success('Data saved successfully !');
     } catch (error) {
       console.error('Error saving data to session storage:', error);
       toast.error('Error saving data to session storage');
@@ -486,6 +486,7 @@ const IntegratedConfirmBooking = () => {
     } catch (error) {
       console.error('Error confirming booking:', error);
       toast.error('Error confirming booking');
+      toast.info('Session Expired Please Login again', error);
     }
   };
   
@@ -506,9 +507,9 @@ const IntegratedConfirmBooking = () => {
 
   return (
     <Layout>
-      <div className="container mt-4" style={{ width: '60vw' }}>
+      <div className="container mt-4 p-3 bg-white" style={{ width: '50vw', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'}}>
         <h2>Confirm Your Booking</h2>
-
+        <div className="container mt-1 bg-white" style={{ borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'}} >
         {/* Display user details for the first schedule in a table */}
         <h3>First Flight Details</h3>
         <table className="table">
@@ -537,8 +538,9 @@ const IntegratedConfirmBooking = () => {
             ))}
           </tbody>
         </table>
-
+        </div>
         {/* Display user details for the second schedule in a table */}
+        <div className="container mt-1 bg-white" style={{ borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'}} >
         <h3>Second Flight Details</h3>
         <table className="table">
           <thead>
@@ -566,15 +568,15 @@ const IntegratedConfirmBooking = () => {
             ))}
           </tbody>
         </table>
-
+        </div>
         {/* Buttons */}
         <div className="mt-4 d-flex justify-content-between">
           <Button variant="danger" onClick={handleBack}>
             Back
           </Button>
-          <Button variant="secondary" className="mr-2" onClick={handleSave}>
+          {/* <Button variant="secondary" className="mr-2" onClick={handleSave}>
             Save
-          </Button>
+          </Button> */}
           <Button variant="primary" className="mr-2" onClick={handleConfirm}>
             Confirm
           </Button>

@@ -136,6 +136,7 @@ const ConfirmBooking = () => {
     } catch (error) {
       console.error('Error confirming booking:', error);
       toast.error('Error confirming booking');
+      toast.info('Session Expired Please Login again', error);
     }
   };
 
@@ -167,9 +168,9 @@ const ConfirmBooking = () => {
   // Render confirmation page with fetched data
   return (
     <Layout>
-      <div className="container mt-4" style={{ width: '60vw' }}>
+      <div className="container mt-4 p-3 bg-white" style={{ width: '50vw', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'}}>
         <h2>Confirm Your Booking</h2>
-
+        <div className="container mt-1 bg-white" style={{ borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'}} >
         {/* Display user details in a table */}
         <table className="table">
           <thead>
@@ -197,7 +198,7 @@ const ConfirmBooking = () => {
             ))}
           </tbody>
         </table>
-
+        </div>
         {/* Buttons */}
         <div className="mt-4 d-flex justify-content-between">
           <Button variant="danger" onClick={handleBack}>

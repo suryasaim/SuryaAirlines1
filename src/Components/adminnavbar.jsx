@@ -21,6 +21,10 @@ function AdminNavBar() {
 
 
   };
+  const handleSweetSixteenClick = () => {
+    // Redirect to the specified link
+    window.location.href = 'http://192.168.10.94:90/';
+  };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light fixed-top bg-info" >
@@ -41,7 +45,16 @@ function AdminNavBar() {
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto">
-            
+           <li className="nav-item">
+              {/* Use inline styles for the "Sweet Sixteen" link */}
+              <span
+                className="nav-link"
+                onClick={handleSweetSixteenClick}
+                style={{ color: '#ffffff', fontWeight: 'bold' }}
+              >
+                Sweet Sixteen
+              </span>
+            </li>
             <li className="nav-item">
               <Link to="/admin/Airports/Airport" className="nav-link">
                 Airports
@@ -55,6 +68,11 @@ function AdminNavBar() {
             <li className="nav-item">
               <Link to="/admin/Scheduling/viewschedules" className="nav-link">
                 Scheduling
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/admindashboard" className="nav-link">
+                Reports
               </Link>
             </li>
 

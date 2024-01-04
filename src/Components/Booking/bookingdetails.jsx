@@ -155,7 +155,7 @@ const BookingDetails = () => {
             </div>
             {index > 0 && (
               <button type="button" className="btn btn-danger mt-2" onClick={() => handleRemoveUser(index)}>
-                Remove User
+                Remove Passenger
               </button>
             )}
           </div>
@@ -182,7 +182,7 @@ const BookingDetails = () => {
           </div>
           <div className="col">
             <button type="button" className="btn btn-primary" onClick={handleAddUser}>
-              Add Another User
+              Add Another Passenger
             </button>
           </div>
           <div className="col">

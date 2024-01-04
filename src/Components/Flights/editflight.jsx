@@ -16,7 +16,7 @@ function EditFlight() {
   useEffect(() => {
     async function fetchFlight() {
       try {
-        const token = 'YOUR_JWT_TOKEN'; // Replace with the actual token
+        const token = localStorage.getItem('authToken'); // Replace with the actual token
         const headers = { Authorization: `Bearer ${token}` };
 
         const response = await axios.get(`http://192.168.10.70:98/api/Flight/${id}`, { headers });

@@ -18,7 +18,7 @@ function Airports() {
         const token = localStorage.getItem('authToken');
         const headers = { Authorization: `Bearer ${token}` };
 
-        const response = await axios.get('http://192.168.10.71:98/api/Airport', { headers });
+        const response = await axios.get('http://192.168.10.70:98/api/Airport', { headers });
 
         setAirports(response.data);
       } catch (error) {
@@ -100,9 +100,9 @@ function Airports() {
                   <Link to={`/admin/airports/editairport/${airport.airportId}`} className="btn btn-primary me-2">
                     Update
                   </Link>
-                  <button className="btn btn-danger" onClick={() => handleDelete(airport.airportId)}>
+                  {/* <button className="btn btn-danger" onClick={() => handleDelete(airport.airportId)}>
                     Delete
-                  </button>
+                  </button> */}
                 </td>
               </tr>
             ))}

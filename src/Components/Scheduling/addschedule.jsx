@@ -27,14 +27,14 @@ const ScheduleFlights = () => {
     };
     
   
-    axios.get('http://192.168.10.71:98/api/Flight/GetFlightdetails', { headers })
+    axios.get('http://192.168.10.70:98/api/Flight/GetFlightdetails', { headers })
       .then(response => {
         
         setFlightNames(response.data);
       })
       .catch(error => console.error('Error fetching flight names:', error));
   
-    axios.get('http://192.168.10.71:98/api/Airport', { headers })
+    axios.get('http://192.168.10.70:98/api/Airport', { headers })
       .then(response => {
         //console.log('Airport details response:', response.data);
         setAirportNames(response.data);
@@ -132,7 +132,7 @@ const ScheduleFlights = () => {
   return (
     <AdminLayout>
       <div>
-        <h1>Schedule Flights</h1>
+        <h2>Schedule Flights</h2>
         <form onSubmit={handleSubmit} className="row g-3">
           <div className="col-md-4">
             <label htmlFor="flightName" className="form-label">Flight Name</label>

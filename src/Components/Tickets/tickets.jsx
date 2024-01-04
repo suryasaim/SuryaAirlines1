@@ -46,7 +46,7 @@ const Tickets = () => {
   
         setTicketDetails(ticketDetailsWithSchedule);
       } catch (error) {
-        console.error('Error fetching ticket details:', error);
+        toast.info('Session Expired Please Login again', error);
       }
     };
 
